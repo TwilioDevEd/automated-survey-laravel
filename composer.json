@@ -11,8 +11,7 @@
     "require-dev": {
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "~4.0",
-        "phpspec/phpspec": "~2.2"
+        "phpunit/phpunit": "~4.0"
     },
     "autoload": {
         "classmap": [
@@ -20,7 +19,7 @@
         ],
         "psr-4": {
             "App\\": "app/",
-            "Twilio\\": "app/Twilio"
+            "Twilio\\": "app/Twilio/"
         }
     },
     "autoload-dev": {
