@@ -4,14 +4,14 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class SendReminders extends Command
+class LoadSurveys extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'surveys:load';
+    protected $signature = 'surveys:load {fileName}';
 
     /**
      * The console command description.
@@ -37,7 +37,21 @@ class SendReminders extends Command
      */
     public function handle()
     {
-        $appointmentReminder = new \App\AppointmentReminders\AppointmentReminder();
-        $appointmentReminder->sendReminders();
+        $filename = $this->argument('fileName');
+        $surveyJSON = file_get_contents($filename);
+
+        $parser = new \App\Twilio\SurveyParser($surveyJSON);
+
+        $survey = new \App\Survey();
+        $survey->title = $parser->title();
+        $survey->save();
+
+        $parser->questions()->each(
+            function ($question) use ($survey) {
+                $questionToSave = new \App\Question($question);
+                $questionToSave->survey()->associate($survey);
+                $questionToSave->save();
+            }
+        );
     }
 }

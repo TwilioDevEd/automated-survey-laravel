@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 class SurveyParser
 {
-    function __construct($survey)
+    public function __construct($survey)
     {
         $parsedSurvey = json_decode($survey, true);
         if ($parsedSurvey === null) {
@@ -15,13 +15,13 @@ class SurveyParser
         $this->survey = collect($parsedSurvey);
     }
 
-    function title()
+    public function title()
     {
         return $this->survey->get('title', 'Untitled survey');
     }
 
-    function questions()
+    public function questions()
     {
-        return $this->survey->get('questions', []);
+        return Collection::make($this->survey->get('questions', collect()));
     }
 }
