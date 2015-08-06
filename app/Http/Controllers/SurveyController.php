@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -51,22 +52,24 @@ class SurveyController extends Controller
     public function show($id)
     {
         $surveyToTake = \App\Survey::find($id);
-        $response = new \Services_Twilio_Twiml();
+        $voiceResponse = new \Services_Twilio_Twiml();
 
         if (is_null($surveyToTake)) {
-            $response->say('Could not find the survey to take');
-            $response->say('Good-bye');
-            $response->hangup();
+            $voiceResponse->say('Could not find the survey to take');
+            $voiceResponse->say('Good-bye');
+            $voiceResponse->hangup();
+
+            $response = new Response($voiceResponse, 404);
 
             return $response;
         }
 
         $surveyTitle = $surveyToTake->title;
 
-        $response->say("Hello and thank you for taking the $surveyTitle survey!");
-        $response->say($surveyToTake->title);
+        $voiceResponse->say("Hello and thank you for taking the $surveyTitle survey!");
+        $voiceResponse->say($surveyToTake->title);
 
-        return $response;
+        return $voiceResponse;
     }
 
     /**
