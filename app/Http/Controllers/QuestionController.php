@@ -90,9 +90,9 @@ class QuestionController extends Controller
     {
         $questionPhrases = collect(
             [
-                "voice"   => "Please record your answer after the beep and then the pound sign",
-                "yes-no"  => "Please press the one key for yes and the zero key for no and then the pound sign",
-                "numeric" => "Please press a number between 1 and 10 and then the pound sign"
+                "voice"   => "Please record your answer after the beep and then hit the pound sign",
+                "yes-no"  => "Please press the one key for yes and the zero key for no and then hit the pound sign",
+                "numeric" => "Please press a number between 1 and 10 and then hit the pound sign"
             ]
         );
 
@@ -110,13 +110,13 @@ class QuestionController extends Controller
             false
         );
 
+        $voiceResponse->say($this->_messageForQuestion($question));
+
         if ($question->kind === "voice") {
             $voiceResponse->record(['method' => 'POST', 'action' => $storeResponseURL]);
         } elseif ($question->kind === "yes-no" || $question->kind === "numeric") {
             $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL]);
         }
-
-        $voiceResponse->say($this->_messageForQuestion($question));
 
         return $voiceResponse;
     }
