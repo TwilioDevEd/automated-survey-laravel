@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Http\RedirectResponse;
+use App\Survey;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -14,6 +17,14 @@
 Route::get(
     '/', function () {
         return view('welcome');
+    }
+);
+
+Route::get(
+    '/first_survey', function () {
+        $firstSurveyId = Survey::all()->first()->id;
+        return redirect(route('survey.show', ['id' => $firstSurveyId]))
+                       ->setStatusCode(303);
     }
 );
 

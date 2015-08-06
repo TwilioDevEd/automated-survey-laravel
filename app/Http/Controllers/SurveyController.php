@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Survey;
 
 class SurveyController extends Controller
 {
@@ -16,7 +17,8 @@ class SurveyController extends Controller
      */
     public function index()
     {
-        //
+        $allSurveys = Survey::all();
+        return response()->view('surveys.index', ['surveys' => $allSurveys]);
     }
 
     /**
@@ -26,7 +28,7 @@ class SurveyController extends Controller
      */
     public function create()
     {
-        return response()->view('surveys.create', array());
+        return response()->view('surveys.create', []);
     }
 
     /**
@@ -48,7 +50,23 @@ class SurveyController extends Controller
      */
     public function show($id)
     {
-        //
+        $surveyToTake = \App\Survey::find($id);
+        $response = new \Services_Twilio_Twiml();
+
+        if (is_null($surveyToTake)) {
+            $response->say('Could not find the survey to take');
+            $response->say('Good-bye');
+            $response->hangup();
+
+            return $response;
+        }
+
+        $surveyTitle = $surveyToTake->title;
+
+        $response->say("Hello and thank you for taking the $surveyTitle survey!");
+        $response->say($surveyToTake->title);
+
+        return $response;
     }
 
     /**
