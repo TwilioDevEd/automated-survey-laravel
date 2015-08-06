@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Survey;
 
-class SurveyController extends Controller
+class QuestionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,8 +16,7 @@ class SurveyController extends Controller
      */
     public function index()
     {
-        $allSurveys = Survey::all();
-        return response()->view('surveys.index', ['surveys' => $allSurveys]);
+        //
     }
 
     /**
@@ -29,7 +26,7 @@ class SurveyController extends Controller
      */
     public function create()
     {
-        return response()->view('surveys.create', []);
+        //
     }
 
     /**
@@ -51,32 +48,8 @@ class SurveyController extends Controller
      */
     public function show($id)
     {
-        $surveyToTake = \App\Survey::find($id);
-        $voiceResponse = new \Services_Twilio_Twiml();
-
-        if (is_null($surveyToTake)) {
-            $voiceResponse->say('Could not find the survey to take');
-            $voiceResponse->say('Good-bye');
-            $voiceResponse->hangup();
-
-            $response = new Response($voiceResponse, 404);
-
-            return $response;
-        }
-
-        $surveyTitle = $surveyToTake->title;
-
-        $voiceResponse->say("Hello and thank you for taking the $surveyTitle survey!");
-        $voiceResponse->say($surveyToTake->title);
-
-        $firstQuestionUrl = route(
-            'question.show',
-            ['id' => $surveyToTake->questions()->first()],
-            false
-        );
-        $voiceResponse->redirect($firstQuestionUrl, ['method' => 'GET']);
-
-        return $voiceResponse;
+        $questionToAsk = \App\Question::find($id);
+        return $this->_commandFor($questionToAsk);
     }
 
     /**
@@ -113,7 +86,7 @@ class SurveyController extends Controller
         //
     }
 
-    private function _messageForQuestion($kind)
+    private function _messageForQuestion($question)
     {
         $questionPhrases = collect(
             [
@@ -123,6 +96,28 @@ class SurveyController extends Controller
             ]
         );
 
-        return $questionPhrases->key($kind, "Please press a number and then the pound sign");
+        return $questionPhrases->get($question->kind, "Please press a number and then the pound sign");
+    }
+
+    private function _commandFor($question)
+    {
+        $voiceResponse = new \Services_Twilio_Twiml();
+        $voiceResponse->say($question->body);
+
+        $storeResponseURL = route(
+            'question.question_response.store',
+            ['question_id' => $question->id],
+            false
+        );
+
+        if ($question->kind === "voice") {
+            $voiceResponse->record(['method' => 'POST', 'action' => $storeResponseURL]);
+        } elseif ($question->kind === "yes-no" || $question->kind === "numeric") {
+            $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL]);
+        }
+
+        $voiceResponse->say($this->_messageForQuestion($question));
+
+        return $voiceResponse;
     }
 }

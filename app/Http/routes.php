@@ -29,3 +29,5 @@ Route::get(
 );
 
 Route::resource('survey', 'SurveyController');
+Route::resource('question', 'QuestionController');
+Route::resource('question.question_response', 'QuestionResponseController');
