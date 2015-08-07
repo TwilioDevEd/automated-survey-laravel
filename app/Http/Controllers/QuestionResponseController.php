@@ -49,7 +49,9 @@ class QuestionResponseController extends Controller
         }
         $newResponse->save();
 
-        return "";
+        return redirect(route('question.show', ['id' => 2]))
+                       ->setStatusCode(303);
+        // return "";
     }
 
     /**
