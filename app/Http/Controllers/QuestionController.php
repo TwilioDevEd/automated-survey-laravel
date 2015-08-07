@@ -102,17 +102,23 @@ class QuestionController extends Controller
     private function _commandFor($question)
     {
         $voiceResponse = new \Services_Twilio_Twiml();
-        $voiceResponse->say($question->body);
 
+        $voiceResponse->say($question->body);
+        $voiceResponse->say($this->_messageForQuestion($question));
+        $voiceResponse = $this->_registerResponseCommand($voiceResponse, $question);
+
+        return $voiceResponse;
+    }
+
+    private function _registerResponseCommand($voiceResponse, $question)
+    {
         $storeResponseURL = route(
             'question.question_response.store',
             ['question_id' => $question->id],
             false
         );
 
-        $voiceResponse->say($this->_messageForQuestion($question));
-
-        if ($question->kind === "voice") {
+        if ($question->kind === 'voice') {
             $voiceResponse->record(['method' => 'POST', 'action' => $storeResponseURL . '?Kind=voice']);
         } elseif ($question->kind === "yes-no") {
             $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL . '?Kind=yes-no']);
@@ -122,4 +128,5 @@ class QuestionController extends Controller
 
         return $voiceResponse;
     }
+
 }

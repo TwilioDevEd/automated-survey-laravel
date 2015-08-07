@@ -49,6 +49,18 @@ class QuestionResponseController extends Controller
         }
         $newResponse->save();
 
+        $nextQuestion = $this->_questionAfter($questionId);
+
+        if (is_null($nextQuestion)) {
+            $voiceResponse = new \Services_Twilio_Twiml();
+            $voiceResponse->say('That was the last question');
+            $voiceResponse->say('Thank you for participating in this survey');
+            $voiceResponse->say('Good-bye');
+            $voiceResponse->hangup();
+
+            return $voiceResponse;
+        }
+
         return redirect(route('question.show', ['id' => $this->_questionAfter($questionId)]))
                        ->setStatusCode(303);
     }
@@ -62,7 +74,12 @@ class QuestionResponseController extends Controller
 
         $nextQuestion = $allQuestions->get($position + 1);
 
-        return $nextQuestion->id;
+        if (is_null($nextQuestion)) {
+            return null;
+        } else {
+            return $nextQuestion->id;
+        }
+
     }
 
     /**
