@@ -57,6 +57,13 @@ class SurveyController extends Controller
         return $voiceResponse;
     }
 
+    public function showResults($surveyId)
+    {
+        $survey = \App\Survey::find($surveyId);
+        $responsesByCall = \App\QuestionResponse::responsesForSurveyByCall(2)->get()->groupBy('call_sid')->values();
+        return response()->view('surveys.results', ['survey' => $survey, 'responses' => $responsesByCall]);
+    }
+
     private function _messageForQuestion($kind)
     {
         $questionPhrases = collect(

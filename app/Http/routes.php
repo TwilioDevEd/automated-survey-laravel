@@ -27,6 +27,10 @@ Route::get(
                        ->setStatusCode(303);
     }
 );
+Route::get(
+    'survey/{survey}/results',
+    ['as' => 'survey.results', 'uses' => 'SurveyController@showResults']
+);
 
 Route::resource(
     'survey', 'SurveyController',

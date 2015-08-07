@@ -10,4 +10,14 @@ class QuestionResponse extends Model
     {
         return $this->belongsTo('App\Question');
     }
+
+    public function scopeResponsesForSurveyByCall($query, $surveyId)
+    {
+        return $query
+            ->join('questions', 'questions.id', '=', 'question_responses.question_id')
+            ->join('surveys', 'surveys.id', '=', 'questions.survey_id')
+            ->where('surveys.id', '=', $surveyId)
+            ->orderBy('question_responses.call_sid')
+            ->orderBy('question_responses.id');
+    }
 }

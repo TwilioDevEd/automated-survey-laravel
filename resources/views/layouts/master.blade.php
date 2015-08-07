@@ -13,7 +13,6 @@
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="{{ route('survey.index') }}">All surveys</a></li>
-                    <li><a href="{{ route('survey.create') }}">New survey</a></li>
                 </ul>
             </div>
         </nav>

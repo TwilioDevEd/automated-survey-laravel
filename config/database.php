@@ -1,5 +1,12 @@
 <?php
 
+$dbConfig = parse_url(getenv("DATABASE_URL"));
+
+$host = $dbConfig["host"];
+$username = $dbConfig["user"];
+$password = $dbConfig["pass"];
+$database = substr($dbConfig["path"], 1);
+
 return [
 
     /*
@@ -26,7 +33,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -43,6 +50,8 @@ return [
     | choice installed on your machine before you begin development.
     |
     */
+
+
 
     'connections' => [
 
@@ -66,10 +75,10 @@ return [
 
         'pgsql' => [
             'driver'   => 'pgsql',
-            'host'     => env('DB_HOST', 'localhost'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'host'     => $host,
+            'database' => $database,
+            'username' => $username,
+            'password' => $password,
             'charset'  => 'utf8',
             'prefix'   => '',
             'schema'   => 'public',
