@@ -28,6 +28,15 @@ Route::get(
     }
 );
 
-Route::resource('survey', 'SurveyController');
-Route::resource('question', 'QuestionController');
-Route::resource('question.question_response', 'QuestionResponseController');
+Route::resource(
+    'survey', 'SurveyController',
+    ['only' => ['index', 'show']]
+);
+Route::resource(
+    'question', 'QuestionController',
+    ['only' => ['show']]
+);
+Route::resource(
+    'question.question_response', 'QuestionResponseController',
+    ['only' => ['store']]
+);

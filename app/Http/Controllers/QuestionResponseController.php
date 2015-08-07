@@ -10,26 +10,6 @@ use App\Http\Controllers\Controller;
 class QuestionResponseController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  Request  $request
@@ -41,28 +21,38 @@ class QuestionResponseController extends Controller
         $newResponse->call_sid = $request->input('CallSid');
         $newResponse->kind = $request->input('Kind');
         $newResponse->question_id = $questionId;
+        $newResponse->response = $this->_responseFromRequest($request);
 
-        if ($request->input('Kind') === 'voice') {
-            $newResponse->response = $request->input('RecordingUrl');
-        } else {
-            $newResponse->response = $request->input('Digits');
-        }
         $newResponse->save();
 
         $nextQuestion = $this->_questionAfter($questionId);
 
         if (is_null($nextQuestion)) {
-            $voiceResponse = new \Services_Twilio_Twiml();
-            $voiceResponse->say('That was the last question');
-            $voiceResponse->say('Thank you for participating in this survey');
-            $voiceResponse->say('Good-bye');
-            $voiceResponse->hangup();
-
-            return $voiceResponse;
+            return $this->_messageAfterLastQuestion();
+        } else {
+            $nextQuestionUrl = route('question.show', ['id' => $this->_questionAfter($questionId)]);
+            return redirect($nextQuestionUrl)->setStatusCode(303);
         }
+    }
 
-        return redirect(route('question.show', ['id' => $this->_questionAfter($questionId)]))
-                       ->setStatusCode(303);
+    private function _responseFromRequest(Request $request)
+    {
+        if ($request->input('Kind') === 'voice') {
+            return $request->input('RecordingUrl');
+        } else {
+            return $request->input('Digits');
+        }
+    }
+
+    private function _messageAfterLastQuestion()
+    {
+        $voiceResponse = new \Services_Twilio_Twiml();
+        $voiceResponse->say('That was the last question');
+        $voiceResponse->say('Thank you for participating in this survey');
+        $voiceResponse->say('Good-bye');
+        $voiceResponse->hangup();
+
+        return $voiceResponse;
     }
 
     private function _questionAfter($questionId)
@@ -74,56 +64,15 @@ class QuestionResponseController extends Controller
 
         $nextQuestion = $allQuestions->get($position + 1);
 
-        if (is_null($nextQuestion)) {
+        return $this->_idIfNotNull($nextQuestion);
+    }
+
+    private function _idIfNotNull($question)
+    {
+        if (is_null($question)) {
             return null;
         } else {
-            return $nextQuestion->id;
+            return $question->id;
         }
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  Request  $request
-     * @param  int  $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }
