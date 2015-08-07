@@ -113,9 +113,11 @@ class QuestionController extends Controller
         $voiceResponse->say($this->_messageForQuestion($question));
 
         if ($question->kind === "voice") {
-            $voiceResponse->record(['method' => 'POST', 'action' => $storeResponseURL]);
-        } elseif ($question->kind === "yes-no" || $question->kind === "numeric") {
-            $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL]);
+            $voiceResponse->record(['method' => 'POST', 'action' => $storeResponseURL . '?Kind=voice']);
+        } elseif ($question->kind === "yes-no") {
+            $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL . '?Kind=yes-no']);
+        } elseif ($question->kind === "numeric") {
+            $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL . '?Kind=numeric']);
         }
 
         return $voiceResponse;

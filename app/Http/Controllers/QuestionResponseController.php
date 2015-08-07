@@ -35,9 +35,21 @@ class QuestionResponseController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store($questionId, Request $request)
     {
-        //
+        $newResponse = new \App\QuestionResponse();
+        $newResponse->call_sid = $request->input('CallSid');
+        $newResponse->kind = $request->input('Kind');
+        $newResponse->question_id = $questionId;
+
+        if ($request->input('Kind') === 'voice') {
+            $newResponse->response = $request->input('RecordingUrl');
+        } else {
+            $newResponse->response = $request->input('Digits');
+        }
+        $newResponse->save();
+
+        return "";
     }
 
     /**
