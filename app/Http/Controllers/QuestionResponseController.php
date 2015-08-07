@@ -49,9 +49,20 @@ class QuestionResponseController extends Controller
         }
         $newResponse->save();
 
-        return redirect(route('question.show', ['id' => 2]))
+        return redirect(route('question.show', ['id' => $this->_questionAfter($questionId)]))
                        ->setStatusCode(303);
-        // return "";
+    }
+
+    private function _questionAfter($questionId)
+    {
+        $question = \App\Question::find($questionId);
+        $survey = \App\Survey::find($question->survey_id);
+        $allQuestions = $survey->questions()->orderBy('id', 'asc')->get();
+        $position = $allQuestions->search($question);
+
+        $nextQuestion = $allQuestions->get($position + 1);
+
+        return $nextQuestion->id;
     }
 
     /**
