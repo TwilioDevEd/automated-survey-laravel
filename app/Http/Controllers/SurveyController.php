@@ -67,7 +67,6 @@ class SurveyController extends Controller
         $surveyTitle = $surveyToTake->title;
 
         $voiceResponse->say("Hello and thank you for taking the $surveyTitle survey!");
-        $voiceResponse->say($surveyToTake->title);
 
         $firstQuestionUrl = route(
             'question.show',
