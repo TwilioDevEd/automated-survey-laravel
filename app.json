@@ -1,6 +1,6 @@
 {
   "name": "Automated surveys with Laravel",
-  "description": "Notify customers of upcoming appointments",
+  "description": "Perform automated phone surveys with Twilio, TwiML and Laravel",
   "keywords": [
     "twilio",
     "surveys",
