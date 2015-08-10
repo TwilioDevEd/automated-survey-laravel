@@ -2,3 +2,12 @@ body {
     margin-left: 10%;
     margin-right: 10%;
 }
+
+span.voice-response-text, i.play-icon {
+    line-height: 30px;
+}
+
+i.play-icon {
+    vertical-align: middle;
+    cursor: pointer;
+}
