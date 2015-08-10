@@ -13,10 +13,12 @@ automatic phone surveys.
 
 1. Clone the repository, copy the included `env.example` as `.env` and
    customize it to your needs. The application only requires a running database
-2. Run the database migrations using `php artisan migrate`. If the
+2. Use composer to install the app's dependencies by running `composer
+   install` in the repo's root
+3. Run the database migrations using `php artisan migrate`. If the
    database is configured correctly in `.env` this will get you a
    working database
-3. In order to run the application you will need at least one
+4. In order to run the application you will need at least one
    survey. The repository includes a sample survey you can use to test
    the application. Run `php artisan surveys:load bear_survey.json` to
    load a survey about bears into your database.
