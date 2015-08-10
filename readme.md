@@ -53,10 +53,13 @@ that
 you have a number you need to configure your number to work with your
 application. Open
 [the number management page](https://www.twilio.com/user/account/phone-numbers/incoming)
-and open a number's configuration by clicking on it. Edit the "Request
-URL" field under the "Voice" section and point it towards your
-ngrok-exposed application `/first_survey` route. See the image below
-for an example:
+and open a number's configuration by clicking on it.
+
+![Open a number configuration](https://raw.github.com/TwilioDevEd/automated-survey-laravel/master/number-conf.png)
+
+Next, edit the "Request URL" field under the "Voice" section and point
+it towards your ngrok-exposed application `/first_survey` route. Set
+the HTTP method to GET. See the image below for an example:
 
 ![Webhook configuration](https://raw.github.com/TwilioDevEd/automated-survey-laravel/master/webhook-conf.png)
 
