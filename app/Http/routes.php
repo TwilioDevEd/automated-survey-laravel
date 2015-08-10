@@ -14,19 +14,9 @@ use App\Survey;
 |
 */
 
-Route::get(
-    '/', function () {
-        return view('welcome');
-    }
-);
+Route::get('/', redirectWithFirstSurvey('survey.results'));
+Route::get('/first_survey', redirectWithFirstSurvey('survey.show'));
 
-Route::get(
-    '/first_survey', function () {
-        $firstSurveyId = Survey::all()->first()->id;
-        return redirect(route('survey.show', ['id' => $firstSurveyId]))
-                       ->setStatusCode(303);
-    }
-);
 Route::get(
     'survey/{survey}/results',
     ['as' => 'survey.results', 'uses' => 'SurveyController@showResults']
@@ -44,3 +34,12 @@ Route::resource(
     'question.question_response', 'QuestionResponseController',
     ['only' => ['store']]
 );
+
+function redirectWithFirstSurvey($routeName)
+{
+    return function() use ($routeName) {
+        $firstSurveyId = Survey::first()->pluck('id');
+        return redirect(route($routeName, ['id' => $firstSurveyId]))
+                                                   ->setStatusCode(303);
+    };
+}
