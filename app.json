@@ -1,0 +1,19 @@
+{
+  "name": "Automated surveys with Laravel",
+  "description": "Notify customers of upcoming appointments",
+  "keywords": [
+    "twilio",
+    "surveys",
+    "laravel",
+    "php"
+  ],
+  "scripts": {
+    "postdeploy": "php artisan migrate; php artisan surveys:load bear_survey.json"
+  },
+  "addons": ["heroku-postgresql:hobby-dev"]
+  ,
+  "website": "https://github.com/TwilioDevEd/automated-survey-laravel",
+  "repository": "https://github.com/TwilioDevEd/automated-survey-laravel",
+  "logo": "https://s3.amazonaws.com/howtodocs/twilio-logo.png",
+  "success_url": "/"
+}
