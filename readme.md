@@ -1,4 +1,4 @@
-# Appointment reminders in PHP with Laravel
+#  Automated surveys using Laravel
 
 This application demostrates how to use Twilio and TwiML to perform
 automatic phone surveys.
