@@ -21,7 +21,9 @@ automatic phone surveys.
    the application. Run `php artisan surveys:load bear_survey.json` to
    load a survey about bears into your database.
 
-### Configuring Twilio to call the application's webhooks
+### Configuring Twilio to call your application
+
+#### Exposing the app via ngrok
 
 For this demo it's necessary that your local application instance is
 accessible from the Internet. The easiest way to accomplish this
@@ -39,6 +41,8 @@ running (port 8000 is the default for Laravel):
 ```
 ngrok 8000
 ```
+
+#### Configuring Twilio's webhooks
 
 You will need to provision at least one Twilio number with voice
 capabilities so the application's users can take surveys. You can do
