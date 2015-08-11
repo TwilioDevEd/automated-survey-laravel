@@ -88,19 +88,6 @@ class SurveyController extends Controller
         return $response;
     }
 
-    private function _messageForQuestion($kind)
-    {
-        $questionPhrases = collect(
-            [
-                "voice"   => "Please record your answer after the beep and then the pound sign",
-                "yes-no"  => "Please press the one key for yes and the zero key for no and then the pound sign",
-                "numeric" => "Please press a number between 1 and 10 and then the pound sign"
-            ]
-        );
-
-        return $questionPhrases->key($kind, "Please press a number and then the pound sign");
-    }
-
     private function _redirectWithFirstSurvey($routeName)
     {
         $firstSurvey = Survey::first();

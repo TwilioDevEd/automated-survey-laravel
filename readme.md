@@ -1,5 +1,7 @@
 #  Automated surveys using Laravel
 
+[![Build Status](https://travis-ci.org/TwilioDevEd/automated-survey-laravel.svg?branch=master)](https://travis-ci.org/TwilioDevEd/automated-survey-laravel)
+
 This application demostrates how to use Twilio and TwiML to perform
 automatic phone surveys.
 
