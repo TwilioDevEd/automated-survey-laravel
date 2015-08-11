@@ -40,8 +40,6 @@ class LoadSurveys extends Command
         $filename = $this->argument('fileName');
         $surveyJSON = file_get_contents($filename);
 
-        var_dump($filename);
-
         $parser = new \App\Twilio\SurveyParser($surveyJSON);
 
         $survey = new \App\Survey();
