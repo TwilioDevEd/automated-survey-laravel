@@ -27,7 +27,7 @@ EOD;
                           'kind' => 'yes-no'];
 
         $this->assertEquals(
-            $parser->questions(),
+            $parser->questions()->toArray(),
             [$firstQuestion, $secondQuestion, $thirdQuestion]
         );
     }
