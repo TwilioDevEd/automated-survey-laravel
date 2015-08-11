@@ -71,6 +71,16 @@ class SurveyController extends Controller
         );
     }
 
+    public function showFirstSurveyResults()
+    {
+        return $this->_redirectWithFirstSurvey('survey.results');
+    }
+
+    public function showFirstSurvey()
+    {
+        return $this->_redirectWithFirstSurvey('survey.show');
+    }
+
     private function _messageForQuestion($kind)
     {
         $questionPhrases = collect(
@@ -82,5 +92,12 @@ class SurveyController extends Controller
         );
 
         return $questionPhrases->key($kind, "Please press a number and then the pound sign");
+    }
+
+    private function _redirectWithFirstSurvey($routeName)
+    {
+        $firstSurveyId = Survey::first()->pluck('id');
+        return redirect(route($routeName, ['id' => $firstSurveyId]))
+                                                ->setStatusCode(303);
     }
 }

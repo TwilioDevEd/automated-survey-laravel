@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\RedirectResponse;
-use App\Survey;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,14 +13,21 @@ use App\Survey;
 |
 */
 
-Route::get('/', redirectWithFirstSurvey('survey.results'));
-Route::get('/first_survey', redirectWithFirstSurvey('survey.show'));
+// Route::get('/', redirectWithFirstSurvey('survey.results'));
+// Route::get('/first_survey', redirectWithFirstSurvey('survey.show'));
 
 Route::get(
     'survey/{survey}/results',
     ['as' => 'survey.results', 'uses' => 'SurveyController@showResults']
 );
-
+Route::get(
+    '/',
+    ['as' => 'approot', 'uses' => 'SurveyController@showFirstSurveyResults']
+);
+Route::get(
+    '/first_survey',
+    ['as' => 'survey.first_survey', 'uses' => 'SurveyController@showFirstSurvey']
+);
 Route::resource(
     'survey', 'SurveyController',
     ['only' => ['index', 'show']]
@@ -34,12 +40,3 @@ Route::resource(
     'question.question_response', 'QuestionResponseController',
     ['only' => ['store']]
 );
-
-function redirectWithFirstSurvey($routeName)
-{
-    return function() use ($routeName) {
-        $firstSurveyId = Survey::first()->pluck('id');
-        return redirect(route($routeName, ['id' => $firstSurveyId]))
-                                                   ->setStatusCode(303);
-    };
-}
