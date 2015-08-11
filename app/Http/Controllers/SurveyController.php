@@ -34,25 +34,12 @@ class SurveyController extends Controller
         $voiceResponse = new \Services_Twilio_Twiml();
 
         if (is_null($surveyToTake)) {
-            $voiceResponse->say('Could not find the survey to take');
-            $voiceResponse->say('Good-bye');
-            $voiceResponse->hangup();
-
-            $response = new Response($voiceResponse, 404);
-
-            return $response;
+            return $this->_noSuchSurvey($voiceResponse);
         }
 
         $surveyTitle = $surveyToTake->title;
-
         $voiceResponse->say("Hello and thank you for taking the $surveyTitle survey!");
-
-        $firstQuestionUrl = route(
-            'question.show',
-            ['id' => $surveyToTake->questions()->first()],
-            false
-        );
-        $voiceResponse->redirect($firstQuestionUrl, ['method' => 'GET']);
+        $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake), ['method' => 'GET']);
 
         return $voiceResponse;
     }
@@ -79,6 +66,26 @@ class SurveyController extends Controller
     public function showFirstSurvey()
     {
         return $this->_redirectWithFirstSurvey('survey.show');
+    }
+
+    private function _urlForFirstQuestion($survey)
+    {
+        return route(
+            'question.show',
+            ['id' => $survey->questions()->first()],
+            false
+        );
+    }
+
+    private function _noSuchSurvey($voiceResponse)
+    {
+        $voiceResponse->say('Could not find the survey to take');
+        $voiceResponse->say('Good-bye');
+        $voiceResponse->hangup();
+
+        $response = new Response($voiceResponse, 404);
+
+        return $response;
     }
 
     private function _messageForQuestion($kind)

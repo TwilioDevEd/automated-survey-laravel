@@ -1,11 +1,15 @@
 <?php
 
-$dbConfig = parse_url(getenv("DATABASE_URL"));
+if (getenv('APP_ENV') === 'testing') {
+    $dbConfig = parse_url(getenv('DATABASE_URL_TEST'));
+} else {
+    $dbConfig = parse_url(getenv('DATABASE_URL'));
+}
 
-$host = $dbConfig["host"];
-$username = $dbConfig["user"];
-$password = $dbConfig["pass"];
-$database = substr($dbConfig["path"], 1);
+$host = $dbConfig['host'];
+$username = $dbConfig['user'];
+$password = $dbConfig['pass'];
+$database = substr($dbConfig['path'], 1);
 
 return [
 

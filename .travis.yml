@@ -8,9 +8,9 @@ install:
 - composer install
 env:
   global:
-  - APP_ENV=test
+  - APP_ENV=testing
   - DB_CONNECTION=pgsql
-  - DATABASE_URL=postgres://postgres:@localhost:5432/surveys
+  - DATABASE_URL_TEST=postgres://postgres:@localhost:5432/surveys_testing
 before_script:
-- psql -c 'create database surveys;' -U postgres
+- psql -c 'create database surveys_test;' -U postgres
 - php artisan migrate
