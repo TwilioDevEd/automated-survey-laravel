@@ -103,8 +103,14 @@ class SurveyController extends Controller
 
     private function _redirectWithFirstSurvey($routeName)
     {
-        $firstSurveyId = Survey::first()->pluck('id');
-        return redirect(route($routeName, ['id' => $firstSurveyId]))
+        $firstSurvey = Survey::first();
+
+        if (is_null($firstSurvey)) {
+            $voiceResponse = new \Services_Twilio_Twiml();
+            return $this->_noSuchSurvey($voiceResponse);
+        }
+
+        return redirect(route($routeName, ['id' => $firstSurvey->id]))
                                                 ->setStatusCode(303);
     }
 }

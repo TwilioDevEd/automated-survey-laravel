@@ -41,6 +41,12 @@ class SurveyControllerTest extends TestCase
             route('survey.show', ['id' => $this->firstSurvey->id]),
             $response->headers->get('Location')
         );
+
+        DB::table('questions')->delete();
+        DB::table('surveys')->delete();
+
+        $response = $this->call('GET', '/first_survey');
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     /**
