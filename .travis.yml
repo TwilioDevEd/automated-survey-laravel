@@ -12,5 +12,5 @@ env:
   - DB_CONNECTION=pgsql
   - DATABASE_URL_TEST=postgres://postgres:@localhost:5432/surveys_testing
 before_script:
-- psql -c 'create database surveys_test;' -U postgres
+- psql -c 'create database surveys_testing;' -U postgres
 - php artisan migrate
