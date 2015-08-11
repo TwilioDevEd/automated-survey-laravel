@@ -8,6 +8,7 @@ install:
 - composer install
 env:
   global:
+  - APP_ENV=test
   - DB_CONNECTION=pgsql
   - DATABASE_URL=postgres://surveys:surveys@localhost:5432/surveys
 before_script:
