@@ -8,7 +8,7 @@
         "php"
     ],
     "scripts": {
-        "postdeploy": "php artisan migrate; php artisan surveys:load bear_survey.json"
+        "postdeploy": "php artisan migrate"
     },
     "addons": ["heroku-postgresql:hobby-dev"]
     ,
