@@ -10,7 +10,7 @@ env:
   global:
   - APP_ENV=test
   - DB_CONNECTION=pgsql
-  - DATABASE_URL=postgres://postgres@localhost:5432/surveys
+  - DATABASE_URL=postgres://postgres:@localhost:5432/surveys
 before_script:
 - psql -c 'create database surveys;' -U postgres
 - php artisan migrate
