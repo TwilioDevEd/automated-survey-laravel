@@ -23,7 +23,8 @@ automatic phone surveys.
 4. In order to run the application you will need at least one
    survey. The repository includes a sample survey you can use to test
    the application. Run `php artisan surveys:load bear_survey.json` to
-   load a survey about bears into your database.
+   load a survey about bears into your database. If you have deployed
+   to Heroku using the button you already have this survey loaded.
 
 ### Configuring Twilio to call your application
 

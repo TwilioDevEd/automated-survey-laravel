@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use \App\QuestionResponse;
 
 class SurveyControllerTest extends TestCase
 {
@@ -70,4 +71,22 @@ class SurveyControllerTest extends TestCase
 
         $this->assertContains($this->firstSurvey->title, $response->content());
     }
+
+    /**
+     * GET test question response index
+     *
+     * @return void
+     */
+    public function testQuestionSurveyResults()
+    {
+        $responseDataOne = ["kind" => "voice", "response" => "//somefakesound.mp3", "call_sid" => "5up3run1qu3"];
+        $responseDataTwo= ["kind" => "numeric", "response" => "4", "call_sid" => "4l505up3run1qu3"];
+
+        $question = [];
+
+        $firstResponse = new QuestionResponse($responseDataOne);
+        $secondResponse = new QuestionResponse($responseDataTwo);
+
+    }
+
 }
