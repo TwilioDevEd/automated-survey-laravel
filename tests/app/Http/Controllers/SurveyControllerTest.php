@@ -4,6 +4,7 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use \App\QuestionResponse;
+use \App\Question;
 
 class SurveyControllerTest extends TestCase
 {
@@ -79,14 +80,29 @@ class SurveyControllerTest extends TestCase
      */
     public function testQuestionSurveyResults()
     {
-        $responseDataOne = ['kind' => 'voice', 'response' => '//somefakesound.mp3', 'call_sid' => '5up3run1qu3'];
-        $responseDataTwo= ['kind' => 'numeric', 'response' => '4', 'call_sid' => '4l505up3run1qu3'];
+        $responseDataOne= ['kind' => 'voice', 'response' => '//faketyfake.mp3', 'call_sid' => '4l505up3run1qu3'];
+        $responseDataTwo = ['kind' => 'voice', 'response' => '//somefakesound.mp3', 'call_sid' => '5up3run1qu3'];
 
-        $question = [];
+        $question = new Question(['body' => 'What is this?', 'kind' => 'voice']);
+        $question->survey()->associate($this->firstSurvey);
+        $question->save();
 
-        $firstResponse = new QuestionResponse($responseDataOne);
-        $secondResponse = new QuestionResponse($responseDataTwo);
+        $question->responses()->createMany([$responseDataOne, $responseDataTwo]);
 
+        $question->push();
+
+        $response = $this->call(
+            'GET',
+            route('survey.results', ['id' => $this->firstSurvey->id])
+        );
+
+        $this->assertEquals($response->original['responses']->count(), 2);
+
+        $actualResponseOne = $response->original['responses']->get(0)->toArray()[0];
+        $actualResponseTwo = $response->original['responses']->get(1)->toArray()[0];
+
+        $this->assertArraySubset($responseDataOne, $actualResponseOne);
+        $this->assertArraySubset($responseDataTwo, $actualResponseTwo);
     }
 
 }
