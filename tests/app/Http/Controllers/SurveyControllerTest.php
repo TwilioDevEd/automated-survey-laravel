@@ -79,8 +79,8 @@ class SurveyControllerTest extends TestCase
      */
     public function testQuestionSurveyResults()
     {
-        $responseDataOne = ["kind" => "voice", "response" => "//somefakesound.mp3", "call_sid" => "5up3run1qu3"];
-        $responseDataTwo= ["kind" => "numeric", "response" => "4", "call_sid" => "4l505up3run1qu3"];
+        $responseDataOne = ['kind' => 'voice', 'response' => '//somefakesound.mp3', 'call_sid' => '5up3run1qu3'];
+        $responseDataTwo= ['kind' => 'numeric', 'response' => '4', 'call_sid' => '4l505up3run1qu3'];
 
         $question = [];
 

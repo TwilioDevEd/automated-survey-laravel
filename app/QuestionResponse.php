@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class QuestionResponse extends Model
 {
+
+    protected $fillable = ['kind', 'response', 'body', 'call_sid'];
+
     public function question()
     {
         return $this->belongsTo('App\Question');
