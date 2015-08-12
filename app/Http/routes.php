@@ -13,9 +13,6 @@ use Illuminate\Http\RedirectResponse;
 |
 */
 
-// Route::get('/', redirectWithFirstSurvey('survey.results'));
-// Route::get('/first_survey', redirectWithFirstSurvey('survey.show'));
-
 Route::get(
     'survey/{survey}/results',
     ['as' => 'survey.results', 'uses' => 'SurveyController@showResults']

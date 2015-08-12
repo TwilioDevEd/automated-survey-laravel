@@ -30,7 +30,7 @@ class QuestionResponseController extends Controller
         if (is_null($nextQuestion)) {
             return $this->_messageAfterLastQuestion();
         } else {
-            $nextQuestionUrl = route('question.show', ['id' => $this->_questionAfter($questionId)]);
+            $nextQuestionUrl = route('question.show', ['id' => $this->_questionAfter($questionId)], false);
             return redirect($nextQuestionUrl)->setStatusCode(303);
         }
     }
