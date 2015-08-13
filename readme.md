@@ -62,7 +62,10 @@ and open a number's configuration by clicking on it.
 
 Next, edit the "Request URL" field under the "Voice" section and point
 it towards your ngrok-exposed application `/first_survey` route. Set
-the HTTP method to GET. See the image below for an example:
+the HTTP method to GET. If you have are trying out the Heroku
+application you need to point Twilio to
+`http://<your-app-name>.herokuapp.com/first_survey`. See the image
+below for an example:
 
 ![Webhook configuration](https://raw.github.com/TwilioDevEd/automated-survey-laravel/master/webhook-conf.png)
 
@@ -73,3 +76,14 @@ http://localhost:8000/survey/1/results
 ```
 
 The results of the survey should be there.
+
+#### Running the tests
+
+The tests interact with the database so you'll first need to migrate
+your test database. First, set the `DATABASE_URL_TEST` and then run:
+
+`php artisan migrate`
+
+The tests then can be run using
+
+`phpunit`
