@@ -1,0 +1,179 @@
+<!DOCTYPE html><html><head><title>Appointment Reminders</title><style>body, html {
+  height:100%;
+  width:100%;
+  padding:0;
+  margin:0;
+  overflow:hidden;
+  background-color:#ddd;
+}
+.wrapper {
+  height:100%;
+  width:100%;
+}</style><link rel="shortcut icon" href="//twilio.com/bundles/marketing/img/favicons/favicon.ico"><link rel="apple-touch-icon" href="//twilio.com/bundles/marketing/img/favicons/favicon_57.png"><link rel="apple-touch-icon" sizes="72x72" href="//twilio.com/bundles/marketing/img/favicons/favicon_72.png"><link rel="apple-touch-icon" sizes="114x114" href="//twilio.com/bundles/marketing/img/favicons/favicon_114.png"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"><link rel="stylesheet" href="viewsaurus.css"></head><body><div class="wrapper"><div id="viewsaurus" data-title="Appointment Reminders"><div class="saurus-panes"><div class="saurus-prose"><div class="saurus-prose-header"><div class="title-outer"><span class="step-title">Appointment Reminders</span></div></div><div class="saurus-nav-buttons"><div class="saurus-nav-button nav-overview"><div class="saurus-nav-button-inner"><i class="fa fa-fw fa-list"></i></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-previous"><div class="saurus-nav-button-inner"><a href=""> <i class="fa fa-fw fa-play fa-rotate-180"></i></a></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-next clickable"><div class="saurus-nav-button-inner"><a href="#1"> <i class="fa fa-fw fa-play"></i></a></div></div><div class="saurus-next-title"><span class="next-title-inner"></span></div></div><div class="saurus-progress-bar"></div><div class="saurus-start"><p>Learn to implement appointment reminders in your web app with Twilio. Appointment reminders allow you to automate the process of reaching out to your customers in advance of an upcoming appointment.</p><a href="#0">Start Tutorial</a></div><div class="saurus-content"><div data-title="Automated surveys with Twilio and Laravel" class="chapter"><div data-file=".env.example" class="step"><h2 id="what-does-the-application-thing-do-">What does the application thing do?</h2>
+<p>This <a href="http://laravel.com/">Laravel 5</a> web application performs
+automated phone surveys using Twilio&#39;s webhooks and TwiML. In addition to
+that, the application displays the survey results. The majority
+of the routes will be accessed by Twilio since users will
+interact with the application mostly through the phone, not
+through the web. Questions might specify voice responses,
+numeric responses or yes-no responses. This application is
+limited to performing the first survey found in the database.</p>
+<p>In this tutorial, we&#39;ll point out the code that interacts with
+Twilio and makes the application tick.  <a href="https://github.com/TwilioDevEd/surveys-laravel/readme.md">Check out the project
+README on
+GitHub</a>
+to see how to run the code yourself.</p>
+<p>Let&#39;s get started! Click the right arrow above to advance to the next code snippet.</p>
+<hr>
+<p><strong>See Also:</strong></p>
+<ul>
+<li><a href="https://www.twilio.com/docs/quickstart/php/twiml">TwiML: PHP Quickstart</a></li>
+<li><a href="https://twilio-php.readthedocs.org/en/latest/">Twilio PHP Helper Library</a></li>
+<li><a href="http://twilio-php.readthedocs.org/en/latest/usage/twiml.html">TwiML creation with PHP</a></li>
+<li><a href="http://laravel.com/docs/5.1">Laravel 5 Docs</a></li>
+<li><a href="http://laravel.com/docs/5.1/eloquent">Eloquent ORM</a></li>
+</ul>
+</div><div data-file=".env.example" data-highlight="5-6" class="step"><h2 id="configure-the-application">Configure the application</h2>
+<p>The application requirements are minimal. The only necessary
+component is a running PostgreSQL database. Rename
+<code>.env.example</code> to <code>.env</code> and configure access your local
+database.</p>
+<hr>
+<p><strong>See Also:</strong> </p>
+<ul>
+<li><a href="http://laravel.com/docs/5.1/installation#configuration">Configuring Laravel Applications</a></li>
+<li><a href="https://www.twilio.com/user/account/phone-numbers/incoming">Your Available Phone Numbers</a></li>
+</ul>
+</div><div data-file="app/Console/Commands/LoadSurveys.php" data-highlight="38-56" class="step"><h2 id="create-a-survey">Create a survey</h2>
+<p>In order to perform automated surveys we first need to have some
+questions we want to ask. For your convenience, the
+application&#39;s repository already includes one that can be loaded
+using the also included &quot;survey:load&quot; <code>artisan</code> command. Refer to the
+application&#39;s
+<a href="https://github.com/TwilioDevEd/surveys-laravel/readme.md">Readme</a>
+for more details on how to fill your database with a sample
+survey. Of course you&#39;re free to write your own survey if you so
+desire.</p>
+<hr>
+<p><strong>See Also:</strong> </p>
+<ul>
+<li><a href="http://laravel.com/docs/5.0/commands">Laravel Commands</a></li>
+<li><a href="http://laravel.com/docs/5.1/eloquent">Models in Eloquent ORM</a></li>
+</ul>
+</div><div data-file="app/Http/Controllers/SurveyController.php" data-highlight="91-102" class="step"><h2 id="respond-to-twilio-s-initial-request">Respond to Twilio&#39;s initial request</h2>
+<p>Whenever one of <a href="https://www.twilio.com/user/account/phone-numbers/incoming">your Twilio phone
+numbers</a>
+receives a call, Twilio will make an HTTP request to the voice request
+URL configured under it with the HTTP verb specified (either GET
+or POST).</p>
+<p>For this application Twilio is configured to make a GET request to
+the application&#39;s <code>/first_survey</code> endpoint. Since our app only
+handles a single survey the endpoint will reply with a &quot;303
+Redirect&quot; with the actual location of the survey. The URL will
+follow <code>/survey/&lt;some_id&gt;</code> scheme. <a href="https://www.twilio.com/docs/api/twiml/your_response">Twilio is a well-behaved HTTP
+client</a> and
+will follow the redirect.</p>
+<hr>
+<p><strong>See Also:</strong> </p>
+<ul>
+<li><a href="https://www.twilio.com/platform/webhooks">Twilio webhooks</a></li>
+<li><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html">HTTP verbs</a></li>
+<li><a href="https://www.twilio.com/docs/api/twiml/your_response">TwiML Voice: Your Response</a></li>
+<li><a href="http://laravel.com/docs/5.1/responses#redirects">Redirects with Laravel</a></li>
+</ul>
+</div><div data-file="app/Http/Controllers/SurveyController.php" data-highlight="31-45" class="step"><h2 id="welcome-the-caller-to-the-survey">Welcome the caller to the survey</h2>
+<p>Now we need to respond to Twilio&#39;s request with a
+<a href="https://www.twilio.com/docs/api/twiml">TwiML</a> document with
+instructions on how to interact with the caller. We use the
+<a href="http://twilio-php.readthedocs.org/en/latest/usage/twiml.html">twilio-php</a>
+library to generate the necessary TwiML.</p>
+<p>First of all, we want to welcome the caller and thank her
+for taking the survey and tell her the name of the survey she&#39;s
+about to take. After that we redirect the caller to the
+first question and so they can start the survey. For this we
+will first use TwiML&#39;s&#39;
+<a href="https://www.twilio.com/docs/api/twiml/sms/redirect"><code>&lt;Say&gt;</code></a> verb
+followed by the
+<a href="https://www.twilio.com/docs/api/twiml/sms/redirect"><code>&lt;Redirect&gt;</code></a>
+verb. The contents of the <code>&lt;Redirect&gt;</code> tag is the URL of the
+survey&#39;s first question.</p>
+<hr>
+<p><strong>See Also:</strong></p>
+<ul>
+<li><a href="http://twilio-php.readthedocs.org/en/latest/">Twilio-PHP documentation</a></li>
+<li><a href="https://www.twilio.com/docs/api/twiml/your_response">TwiML Voice: Your Response</a></li>
+<li><a href="https://www.twilio.com/docs/api/twiml/say">TwiML Voice: &lt;Say&gt;</a></li>
+<li><a href="https://www.twilio.com/docs/api/twiml/redirect">TwiML Voice: &lt;Redirect&gt;</a></li>
+</ul>
+</div><div data-file="app/Http/Controllers/QuestionController.php" class="step"><h2 id="ask-the-caller-a-question">Ask the caller a question</h2>
+<p>At this point, the Twilio client has made a request for the
+first question. Once again, we will use &quot;twilio-php&quot; to generate
+a response. First we will ask a question, say instructions on
+how to answer the question and finally record the answer. Note
+that instructions on how to answer depend on the type of
+question we ask. We also record the answer differently if we
+expect keypad input or voice input.</p>
+<p>Recording the answer is slightly more involved. If the question
+is of kind &quot;voice&quot; then we use the
+<a href="https://www.twilio.com/docs/api/twiml/sms/redirect"><code>&lt;Record&gt;</code></a>
+verb. However, if we expect dial pad input we use the the
+<a href="https://www.twilio.com/docs/api/twiml/sms/redirect"><code>&lt;Gather&gt;</code></a>
+verb. Both verbs take an <code>action</code> attribute and a <code>method</code>
+attribute that Twilio&#39;s client will invoke after the caller&#39;s
+answer has been recorded.</p>
+<p>Since we want to create a new resource the HTTP verb will be
+<code>POST</code> for both <code>&lt;Gather&gt;</code> or <code>&lt;Record&gt;</code>. The <code>action</code> URL
+will be <code>/question/&lt;question_id&gt;/question_response</code> for both
+TwiML verbs. We also include a URL parameter <code>?Kind=&lt;question
+kind&gt;</code> so we can identify the answer question when recording it.</p>
+<hr>
+<p><strong>See Also:</strong></p>
+<ul>
+<li><a href="https://www.twilio.com/docs/api/twiml/gather">TwiML Voice: &lt;Gather&gt;</a></li>
+<li><a href="https://www.twilio.com/docs/api/twiml/record">TwiML Voice: &lt;Record&gt;</a></li>
+</ul>
+</div><div data-file="app/Http/Controllers/QuestionResponseController.php" data-highlight="18-36" class="step"><h2 id="record-a-question-s-answer">Record a question&#39;s answer</h2>
+<p>Now Twilio has made a POST request to the
+<code>/question/&lt;question_id&gt;/question_response</code></p>
+<hr>
+<p><strong>See Also:</strong> </p>
+<ul>
+<li><a href="http://laravel.com/docs/5.1/installation#configuration">Accessing configuration values in Laravel</a></li>
+<li><a href="https://twilio-php.readthedocs.org/en/latest/index.html#quickstart">Get Started with the REST API in PHP</a></li>
+</ul>
+</div><div data-file=".env.example" data-highlight="41-76" class="step"><h2 id="send-reminder-messages-with-the-twilio-api">Send reminder messages with the Twilio API</h2>
+<p>These two private functions are called for every appointment coming up that
+requires a reminder to be sent.  The first formats the text of the message to
+be sent out. The second actually uses the Twilio REST API client to send out a
+text message.</p>
+<p>We provide a <code>To</code> parameter which is the customer&#39;s phone number, a <code>From</code>
+parameter which is a <a href="https://www.twilio.com/user/account/phone-numbers/incoming">number in our account</a>,
+and a <code>Body</code> parameter which contains the text of the message.</p>
+<hr>
+<p><strong>See Also:</strong> </p>
+<ul>
+<li><a href="http://carbon.nesbot.com/docs/#api-formatting">Date Formatting with Carbon</a></li>
+<li><a href="https://twilio-php.readthedocs.org/en/latest/index.html#quickstart">Sending Text Messages in PHP</a></li>
+</ul>
+</div><div class="step"><h2 id="where-to-next-">Where to next?</h2>
+<p>That&#39;s it! Our Laravel application is all set to send out reminders for
+upcoming appointments. We hope you found this sample application useful. 
+If you&#39;re a PHP developer working with Twilio, you might enjoy these other tutorials:</p>
+<h3 id="-click-to-call-https-www-twilio-com-docs-howto-walkthrough-click-to-call-php-laravel-"><a href="https://www.twilio.com/docs/howto/walkthrough/click-to-call/php/laravel">Click to Call</a></h3>
+<p>Put a button on your web page that connects visitors to live support or sales
+people via telephone.</p>
+<h3 id="-two-factor-authentication-https-www-twilio-com-docs-howto-walkthrough-two-factor-authentication-php-laravel-"><a href="https://www.twilio.com/docs/howto/walkthrough/two-factor-authentication/php/laravel">Two-Factor Authentication</a></h3>
+<p>Improve the security of Laravel&#39;s built-in login functionality by adding
+two-factor authentication via text message.</p>
+<h3 id="did-this-help-">Did this help?</h3>
+<p>As always, we&#39;d love to hear what you thought of this tutorial!
+<a href="mailto:devedoss@twilio.com">Shoot us a note</a> to let us know what you liked
+and what we can do better. See you next time!</p>
+</div></div>
+<div class="saurus-files" style="display:none;"><textarea class="saurus-file" data-file=".env.example" data-mode="text">QVBQX0VOVj1sb2NhbApBUFBfREVCVUc9dHJ1ZQpBUFBfS0VZPVNvbWVSYW5kb21TdHJpbmcKCkRBVEFCQVNFX1VSTD1wb3N0Z3JlczovL3N1cnZleXM6c3VydmV5c0Bsb2NhbGhvc3Q6NTQzMi9zdXJ2ZXlzCkRBVEFCQVNFX1VSTF9URVNUPXBvc3RncmVzOi8vc3VydmV5czpzdXJ2ZXlzQGxvY2FsaG9zdDo1NDMyL3N1cnZleXNfdGVzdAo=</textarea>
+<textarea class="saurus-file" data-file="app/Console/Commands/LoadSurveys.php" data-mode="php">PD9waHAKCm5hbWVzcGFjZSBBcHBcQ29uc29sZVxDb21tYW5kczsKCnVzZSBJbGx1bWluYXRlXENvbnNvbGVcQ29tbWFuZDsKCmNsYXNzIExvYWRTdXJ2ZXlzIGV4dGVuZHMgQ29tbWFuZAp7CiAgICAvKioKICAgICAqIFRoZSBuYW1lIGFuZCBzaWduYXR1cmUgb2YgdGhlIGNvbnNvbGUgY29tbWFuZC4KICAgICAqCiAgICAgKiBAdmFyIHN0cmluZwogICAgICovCiAgICBwcm90ZWN0ZWQgJHNpZ25hdHVyZSA9ICdzdXJ2ZXlzOmxvYWQge2ZpbGVOYW1lfSc7CgogICAgLyoqCiAgICAgKiBUaGUgY29uc29sZSBjb21tYW5kIGRlc2NyaXB0aW9uLgogICAgICoKICAgICAqIEB2YXIgc3RyaW5nCiAgICAgKi8KICAgIHByb3RlY3RlZCAkZGVzY3JpcHRpb24gPSAnTG9hZCBzdXJ2ZXlzIGludG8gdGhlIGRhdGFiYXNlJzsKCiAgICAvKioKICAgICAqIENyZWF0ZSBhIG5ldyBjb21tYW5kIGluc3RhbmNlLgogICAgICoKICAgICAqIEByZXR1cm4gdm9pZAogICAgICovCiAgICBwdWJsaWMgZnVuY3Rpb24gX19jb25zdHJ1Y3QoKQogICAgewogICAgICAgIHBhcmVudDo6X19jb25zdHJ1Y3QoKTsKICAgIH0KCiAgICAvKioKICAgICAqIEV4ZWN1dGUgdGhlIGNvbnNvbGUgY29tbWFuZC4KICAgICAqCiAgICAgKiBAcmV0dXJuIHZvaWQKICAgICAqLwogICAgcHVibGljIGZ1bmN0aW9uIGhhbmRsZSgpCiAgICB7CiAgICAgICAgJGZpbGVuYW1lID0gJHRoaXMtPmFyZ3VtZW50KCdmaWxlTmFtZScpOwogICAgICAgICRzdXJ2ZXlKU09OID0gZmlsZV9nZXRfY29udGVudHMoJGZpbGVuYW1lKTsKCiAgICAgICAgJHBhcnNlciA9IG5ldyBcQXBwXFR3aWxpb1xTdXJ2ZXlQYXJzZXIoJHN1cnZleUpTT04pOwoKICAgICAgICAkc3VydmV5ID0gbmV3IFxBcHBcU3VydmV5KCk7CiAgICAgICAgJHN1cnZleS0+dGl0bGUgPSAkcGFyc2VyLT50aXRsZSgpOwogICAgICAgICRzdXJ2ZXktPnNhdmUoKTsKCiAgICAgICAgJHBhcnNlci0+cXVlc3Rpb25zKCktPmVhY2goCiAgICAgICAgICAgIGZ1bmN0aW9uICgkcXVlc3Rpb24pIHVzZSAoJHN1cnZleSkgewogICAgICAgICAgICAgICAgJHF1ZXN0aW9uVG9TYXZlID0gbmV3IFxBcHBcUXVlc3Rpb24oJHF1ZXN0aW9uKTsKICAgICAgICAgICAgICAgICRxdWVzdGlvblRvU2F2ZS0+c3VydmV5KCktPmFzc29jaWF0ZSgkc3VydmV5KTsKICAgICAgICAgICAgICAgICRxdWVzdGlvblRvU2F2ZS0+c2F2ZSgpOwogICAgICAgICAgICB9CiAgICAgICAgKTsKICAgIH0KfQo=</textarea>
+<textarea class="saurus-file" data-file="app/Http/Controllers/SurveyController.php" data-mode="php">PD9waHAKCm5hbWVzcGFjZSBBcHBcSHR0cFxDb250cm9sbGVyczsKCnVzZSBJbGx1bWluYXRlXEh0dHBcUmVxdWVzdDsKdXNlIElsbHVtaW5hdGVcSHR0cFxSZXNwb25zZTsKCnVzZSBBcHBcSHR0cFxSZXF1ZXN0czsKdXNlIEFwcFxIdHRwXENvbnRyb2xsZXJzXENvbnRyb2xsZXI7CnVzZSBBcHBcU3VydmV5OwoKY2xhc3MgU3VydmV5Q29udHJvbGxlciBleHRlbmRzIENvbnRyb2xsZXIKewogICAgLyoqCiAgICAgKiBEaXNwbGF5IGEgbGlzdGluZyBvZiB0aGUgcmVzb3VyY2UuCiAgICAgKgogICAgICogQHJldHVybiBSZXNwb25zZQogICAgICovCiAgICBwdWJsaWMgZnVuY3Rpb24gaW5kZXgoKQogICAgewogICAgICAgICRhbGxTdXJ2ZXlzID0gU3VydmV5OjphbGwoKTsKICAgICAgICByZXR1cm4gcmVzcG9uc2UoKS0+dmlldygnc3VydmV5cy5pbmRleCcsIFsnc3VydmV5cycgPT4gJGFsbFN1cnZleXNdKTsKICAgIH0KCiAgICAvKioKICAgICAqIERpc3BsYXkgdGhlIHNwZWNpZmllZCByZXNvdXJjZS4KICAgICAqCiAgICAgKiBAcGFyYW0gIGludCAgJGlkCiAgICAgKiBAcmV0dXJuIFJlc3BvbnNlCiAgICAgKi8KICAgIHB1YmxpYyBmdW5jdGlvbiBzaG93KCRpZCkKICAgIHsKICAgICAgICAkc3VydmV5VG9UYWtlID0gXEFwcFxTdXJ2ZXk6OmZpbmQoJGlkKTsKICAgICAgICAkdm9pY2VSZXNwb25zZSA9IG5ldyBcU2VydmljZXNfVHdpbGlvX1R3aW1sKCk7CgogICAgICAgIGlmIChpc19udWxsKCRzdXJ2ZXlUb1Rha2UpKSB7CiAgICAgICAgICAgIHJldHVybiAkdGhpcy0+X25vU3VjaFN1cnZleSgkdm9pY2VSZXNwb25zZSk7CiAgICAgICAgfQoKICAgICAgICAkc3VydmV5VGl0bGUgPSAkc3VydmV5VG9UYWtlLT50aXRsZTsKICAgICAgICAkdm9pY2VSZXNwb25zZS0+c2F5KCJIZWxsbyBhbmQgdGhhbmsgeW91IGZvciB0YWtpbmcgdGhlICRzdXJ2ZXlUaXRsZSBzdXJ2ZXkhIik7CiAgICAgICAgJHZvaWNlUmVzcG9uc2UtPnJlZGlyZWN0KCR0aGlzLT5fdXJsRm9yRmlyc3RRdWVzdGlvbigkc3VydmV5VG9UYWtlKSwgWydtZXRob2QnID0+ICdHRVQnXSk7CgogICAgICAgIHJldHVybiAkdm9pY2VSZXNwb25zZTsKICAgIH0KCiAgICBwdWJsaWMgZnVuY3Rpb24gc2hvd1Jlc3VsdHMoJHN1cnZleUlkKQogICAgewogICAgICAgICRzdXJ2ZXkgPSBcQXBwXFN1cnZleTo6ZmluZCgkc3VydmV5SWQpOwogICAgICAgICRyZXNwb25zZXNCeUNhbGwgPSBcQXBwXFF1ZXN0aW9uUmVzcG9uc2U6OnJlc3BvbnNlc0ZvclN1cnZleUJ5Q2FsbCgkc3VydmV5SWQpCiAgICAgICAgICAgICAgICAgICAgICAgICAtPmdldCgpCiAgICAgICAgICAgICAgICAgICAgICAgICAtPmdyb3VwQnkoJ2NhbGxfc2lkJykKICAgICAgICAgICAgICAgICAgICAgICAgIC0+dmFsdWVzKCk7CgogICAgICAgIHJldHVybiByZXNwb25zZSgpLT52aWV3KAogICAgICAgICAgICAnc3VydmV5cy5yZXN1bHRzJywKICAgICAgICAgICAgWydzdXJ2ZXknID0+ICRzdXJ2ZXksICdyZXNwb25zZXMnID0+ICRyZXNwb25zZXNCeUNhbGxdCiAgICAgICAgKTsKICAgIH0KCiAgICBwdWJsaWMgZnVuY3Rpb24gc2hvd0ZpcnN0U3VydmV5UmVzdWx0cygpCiAgICB7CiAgICAgICAgcmV0dXJuICR0aGlzLT5fcmVkaXJlY3RXaXRoRmlyc3RTdXJ2ZXkoJ3N1cnZleS5yZXN1bHRzJyk7CiAgICB9CgogICAgcHVibGljIGZ1bmN0aW9uIHNob3dGaXJzdFN1cnZleSgpCiAgICB7CiAgICAgICAgcmV0dXJuICR0aGlzLT5fcmVkaXJlY3RXaXRoRmlyc3RTdXJ2ZXkoJ3N1cnZleS5zaG93Jyk7CiAgICB9CgogICAgcHJpdmF0ZSBmdW5jdGlvbiBfdXJsRm9yRmlyc3RRdWVzdGlvbigkc3VydmV5KQogICAgewogICAgICAgIHJldHVybiByb3V0ZSgKICAgICAgICAgICAgJ3F1ZXN0aW9uLnNob3cnLAogICAgICAgICAgICBbJ2lkJyA9PiAkc3VydmV5LT5xdWVzdGlvbnMoKS0+Zmlyc3QoKV0sCiAgICAgICAgICAgIGZhbHNlCiAgICAgICAgKTsKICAgIH0KCiAgICBwcml2YXRlIGZ1bmN0aW9uIF9ub1N1Y2hTdXJ2ZXkoJHZvaWNlUmVzcG9uc2UpCiAgICB7CiAgICAgICAgJHZvaWNlUmVzcG9uc2UtPnNheSgnQ291bGQgbm90IGZpbmQgdGhlIHN1cnZleSB0byB0YWtlJyk7CiAgICAgICAgJHZvaWNlUmVzcG9uc2UtPnNheSgnR29vZC1ieWUnKTsKICAgICAgICAkdm9pY2VSZXNwb25zZS0+aGFuZ3VwKCk7CgogICAgICAgICRyZXNwb25zZSA9IG5ldyBSZXNwb25zZSgkdm9pY2VSZXNwb25zZSwgNDA0KTsKCiAgICAgICAgcmV0dXJuICRyZXNwb25zZTsKICAgIH0KCiAgICBwcml2YXRlIGZ1bmN0aW9uIF9yZWRpcmVjdFdpdGhGaXJzdFN1cnZleSgkcm91dGVOYW1lKQogICAgewogICAgICAgICRmaXJzdFN1cnZleSA9IFN1cnZleTo6Zmlyc3QoKTsKCiAgICAgICAgaWYgKGlzX251bGwoJGZpcnN0U3VydmV5KSkgewogICAgICAgICAgICAkdm9pY2VSZXNwb25zZSA9IG5ldyBcU2VydmljZXNfVHdpbGlvX1R3aW1sKCk7CiAgICAgICAgICAgIHJldHVybiAkdGhpcy0+X25vU3VjaFN1cnZleSgkdm9pY2VSZXNwb25zZSk7CiAgICAgICAgfQoKICAgICAgICByZXR1cm4gcmVkaXJlY3Qocm91dGUoJHJvdXRlTmFtZSwgWydpZCcgPT4gJGZpcnN0U3VydmV5LT5pZF0pKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAtPnNldFN0YXR1c0NvZGUoMzAzKTsKICAgIH0KfQo=</textarea>
+<textarea class="saurus-file" data-file="app/Http/Controllers/QuestionController.php" data-mode="php">PD9waHAKCm5hbWVzcGFjZSBBcHBcSHR0cFxDb250cm9sbGVyczsKCnVzZSBJbGx1bWluYXRlXEh0dHBcUmVxdWVzdDsKCnVzZSBBcHBcSHR0cFxSZXF1ZXN0czsKdXNlIEFwcFxIdHRwXENvbnRyb2xsZXJzXENvbnRyb2xsZXI7CgpjbGFzcyBRdWVzdGlvbkNvbnRyb2xsZXIgZXh0ZW5kcyBDb250cm9sbGVyCnsKICAgIC8qKgogICAgICogRGlzcGxheSB0aGUgc3BlY2lmaWVkIHJlc291cmNlLgogICAgICoKICAgICAqIEBwYXJhbSAgaW50ICAkaWQKICAgICAqIEByZXR1cm4gUmVzcG9uc2UKICAgICAqLwogICAgcHVibGljIGZ1bmN0aW9uIHNob3coJGlkKQogICAgewogICAgICAgICRxdWVzdGlvblRvQXNrID0gXEFwcFxRdWVzdGlvbjo6ZmluZCgkaWQpOwogICAgICAgIHJldHVybiAkdGhpcy0+X2NvbW1hbmRGb3IoJHF1ZXN0aW9uVG9Bc2spOwogICAgfQoKICAgIHByaXZhdGUgZnVuY3Rpb24gX21lc3NhZ2VGb3JRdWVzdGlvbigkcXVlc3Rpb24pCiAgICB7CiAgICAgICAgJHF1ZXN0aW9uUGhyYXNlcyA9IGNvbGxlY3QoCiAgICAgICAgICAgIFsKICAgICAgICAgICAgICAgICJ2b2ljZSIgICA9PiAiUGxlYXNlIHJlY29yZCB5b3VyIGFuc3dlciBhZnRlciB0aGUgYmVlcCBhbmQgdGhlbiBoaXQgdGhlIHBvdW5kIHNpZ24iLAogICAgICAgICAgICAgICAgInllcy1ubyIgID0+ICJQbGVhc2UgcHJlc3MgdGhlIG9uZSBrZXkgZm9yIHllcyBhbmQgdGhlIHplcm8ga2V5IGZvciBubyBhbmQgdGhlbiBoaXQgdGhlIHBvdW5kIHNpZ24iLAogICAgICAgICAgICAgICAgIm51bWVyaWMiID0+ICJQbGVhc2UgcHJlc3MgYSBudW1iZXIgYmV0d2VlbiAxIGFuZCAxMCBhbmQgdGhlbiBoaXQgdGhlIHBvdW5kIHNpZ24iCiAgICAgICAgICAgIF0KICAgICAgICApOwoKICAgICAgICByZXR1cm4gJHF1ZXN0aW9uUGhyYXNlcy0+Z2V0KCRxdWVzdGlvbi0+a2luZCwgIlBsZWFzZSBwcmVzcyBhIG51bWJlciBhbmQgdGhlbiB0aGUgcG91bmQgc2lnbiIpOwogICAgfQoKICAgIHByaXZhdGUgZnVuY3Rpb24gX2NvbW1hbmRGb3IoJHF1ZXN0aW9uKQogICAgewogICAgICAgICR2b2ljZVJlc3BvbnNlID0gbmV3IFxTZXJ2aWNlc19Ud2lsaW9fVHdpbWwoKTsKCiAgICAgICAgJHZvaWNlUmVzcG9uc2UtPnNheSgkcXVlc3Rpb24tPmJvZHkpOwogICAgICAgICR2b2ljZVJlc3BvbnNlLT5zYXkoJHRoaXMtPl9tZXNzYWdlRm9yUXVlc3Rpb24oJHF1ZXN0aW9uKSk7CiAgICAgICAgJHZvaWNlUmVzcG9uc2UgPSAkdGhpcy0+X3JlZ2lzdGVyUmVzcG9uc2VDb21tYW5kKCR2b2ljZVJlc3BvbnNlLCAkcXVlc3Rpb24pOwoKICAgICAgICByZXR1cm4gJHZvaWNlUmVzcG9uc2U7CiAgICB9CgogICAgcHJpdmF0ZSBmdW5jdGlvbiBfcmVnaXN0ZXJSZXNwb25zZUNvbW1hbmQoJHZvaWNlUmVzcG9uc2UsICRxdWVzdGlvbikKICAgIHsKICAgICAgICAkc3RvcmVSZXNwb25zZVVSTCA9IHJvdXRlKAogICAgICAgICAgICAncXVlc3Rpb24ucXVlc3Rpb25fcmVzcG9uc2Uuc3RvcmUnLAogICAgICAgICAgICBbJ3F1ZXN0aW9uX2lkJyA9PiAkcXVlc3Rpb24tPmlkXSwKICAgICAgICAgICAgZmFsc2UKICAgICAgICApOwoKICAgICAgICBpZiAoJHF1ZXN0aW9uLT5raW5kID09PSAndm9pY2UnKSB7CiAgICAgICAgICAgICR2b2ljZVJlc3BvbnNlLT5yZWNvcmQoWydtZXRob2QnID0+ICdQT1NUJywgJ2FjdGlvbicgPT4gJHN0b3JlUmVzcG9uc2VVUkwgLiAnP0tpbmQ9dm9pY2UnXSk7CiAgICAgICAgfSBlbHNlaWYgKCRxdWVzdGlvbi0+a2luZCA9PT0gInllcy1ubyIpIHsKICAgICAgICAgICAgJHZvaWNlUmVzcG9uc2UtPmdhdGhlcihbJ21ldGhvZCcgPT4gJ1BPU1QnLCAnYWN0aW9uJyA9PiAkc3RvcmVSZXNwb25zZVVSTCAuICc/S2luZD15ZXMtbm8nXSk7CiAgICAgICAgfSBlbHNlaWYgKCRxdWVzdGlvbi0+a2luZCA9PT0gIm51bWVyaWMiKSB7CiAgICAgICAgICAgICR2b2ljZVJlc3BvbnNlLT5nYXRoZXIoWydtZXRob2QnID0+ICdQT1NUJywgJ2FjdGlvbicgPT4gJHN0b3JlUmVzcG9uc2VVUkwgLiAnP0tpbmQ9bnVtZXJpYyddKTsKICAgICAgICB9CiAgICAgICAgcmV0dXJuICR2b2ljZVJlc3BvbnNlOwogICAgfQoKfQo=</textarea>
+<textarea class="saurus-file" data-file="app/Http/Controllers/QuestionResponseController.php" data-mode="php">PD9waHAKCm5hbWVzcGFjZSBBcHBcSHR0cFxDb250cm9sbGVyczsKCnVzZSBJbGx1bWluYXRlXEh0dHBcUmVxdWVzdDsKCnVzZSBBcHBcSHR0cFxSZXF1ZXN0czsKdXNlIEFwcFxIdHRwXENvbnRyb2xsZXJzXENvbnRyb2xsZXI7CgpjbGFzcyBRdWVzdGlvblJlc3BvbnNlQ29udHJvbGxlciBleHRlbmRzIENvbnRyb2xsZXIKewogICAgLyoqCiAgICAgKiBTdG9yZSBhIG5ld2x5IGNyZWF0ZWQgcmVzb3VyY2UgaW4gc3RvcmFnZS4KICAgICAqCiAgICAgKiBAcGFyYW0gIFJlcXVlc3QgICRyZXF1ZXN0CiAgICAgKiBAcmV0dXJuIFJlc3BvbnNlCiAgICAgKi8KICAgIHB1YmxpYyBmdW5jdGlvbiBzdG9yZSgkcXVlc3Rpb25JZCwgUmVxdWVzdCAkcmVxdWVzdCkKICAgIHsKICAgICAgICAkbmV3UmVzcG9uc2UgPSBuZXcgXEFwcFxRdWVzdGlvblJlc3BvbnNlKCk7CiAgICAgICAgJG5ld1Jlc3BvbnNlLT5jYWxsX3NpZCA9ICRyZXF1ZXN0LT5pbnB1dCgnQ2FsbFNpZCcpOwogICAgICAgICRuZXdSZXNwb25zZS0+a2luZCA9ICRyZXF1ZXN0LT5pbnB1dCgnS2luZCcpOwogICAgICAgICRuZXdSZXNwb25zZS0+cXVlc3Rpb25faWQgPSAkcXVlc3Rpb25JZDsKICAgICAgICAkbmV3UmVzcG9uc2UtPnJlc3BvbnNlID0gJHRoaXMtPl9yZXNwb25zZUZyb21SZXF1ZXN0KCRyZXF1ZXN0KTsKCiAgICAgICAgJG5ld1Jlc3BvbnNlLT5zYXZlKCk7CgogICAgICAgICRuZXh0UXVlc3Rpb24gPSAkdGhpcy0+X3F1ZXN0aW9uQWZ0ZXIoJHF1ZXN0aW9uSWQpOwoKICAgICAgICBpZiAoaXNfbnVsbCgkbmV4dFF1ZXN0aW9uKSkgewogICAgICAgICAgICByZXR1cm4gJHRoaXMtPl9tZXNzYWdlQWZ0ZXJMYXN0UXVlc3Rpb24oKTsKICAgICAgICB9IGVsc2UgewogICAgICAgICAgICAkbmV4dFF1ZXN0aW9uVXJsID0gcm91dGUoJ3F1ZXN0aW9uLnNob3cnLCBbJ2lkJyA9PiAkdGhpcy0+X3F1ZXN0aW9uQWZ0ZXIoJHF1ZXN0aW9uSWQpXSwgZmFsc2UpOwogICAgICAgICAgICByZXR1cm4gcmVkaXJlY3QoJG5leHRRdWVzdGlvblVybCktPnNldFN0YXR1c0NvZGUoMzAzKTsKICAgICAgICB9CiAgICB9CgogICAgcHJpdmF0ZSBmdW5jdGlvbiBfcmVzcG9uc2VGcm9tUmVxdWVzdChSZXF1ZXN0ICRyZXF1ZXN0KQogICAgewogICAgICAgIGlmICgkcmVxdWVzdC0+aW5wdXQoJ0tpbmQnKSA9PT0gJ3ZvaWNlJykgewogICAgICAgICAgICByZXR1cm4gJHJlcXVlc3QtPmlucHV0KCdSZWNvcmRpbmdVcmwnKTsKICAgICAgICB9IGVsc2UgewogICAgICAgICAgICByZXR1cm4gJHJlcXVlc3QtPmlucHV0KCdEaWdpdHMnKTsKICAgICAgICB9CiAgICB9CgogICAgcHJpdmF0ZSBmdW5jdGlvbiBfbWVzc2FnZUFmdGVyTGFzdFF1ZXN0aW9uKCkKICAgIHsKICAgICAgICAkdm9pY2VSZXNwb25zZSA9IG5ldyBcU2VydmljZXNfVHdpbGlvX1R3aW1sKCk7CiAgICAgICAgJHZvaWNlUmVzcG9uc2UtPnNheSgnVGhhdCB3YXMgdGhlIGxhc3QgcXVlc3Rpb24nKTsKICAgICAgICAkdm9pY2VSZXNwb25zZS0+c2F5KCdUaGFuayB5b3UgZm9yIHBhcnRpY2lwYXRpbmcgaW4gdGhpcyBzdXJ2ZXknKTsKICAgICAgICAkdm9pY2VSZXNwb25zZS0+c2F5KCdHb29kLWJ5ZScpOwogICAgICAgICR2b2ljZVJlc3BvbnNlLT5oYW5ndXAoKTsKCiAgICAgICAgcmV0dXJuICR2b2ljZVJlc3BvbnNlOwogICAgfQoKICAgIHByaXZhdGUgZnVuY3Rpb24gX3F1ZXN0aW9uQWZ0ZXIoJHF1ZXN0aW9uSWQpCiAgICB7CiAgICAgICAgJHF1ZXN0aW9uID0gXEFwcFxRdWVzdGlvbjo6ZmluZCgkcXVlc3Rpb25JZCk7CiAgICAgICAgJHN1cnZleSA9IFxBcHBcU3VydmV5OjpmaW5kKCRxdWVzdGlvbi0+c3VydmV5X2lkKTsKICAgICAgICAkYWxsUXVlc3Rpb25zID0gJHN1cnZleS0+cXVlc3Rpb25zKCktPm9yZGVyQnkoJ2lkJywgJ2FzYycpLT5nZXQoKTsKICAgICAgICAkcG9zaXRpb24gPSAkYWxsUXVlc3Rpb25zLT5zZWFyY2goJHF1ZXN0aW9uKTsKCiAgICAgICAgJG5leHRRdWVzdGlvbiA9ICRhbGxRdWVzdGlvbnMtPmdldCgkcG9zaXRpb24gKyAxKTsKCiAgICAgICAgcmV0dXJuICR0aGlzLT5faWRJZk5vdE51bGwoJG5leHRRdWVzdGlvbik7CiAgICB9CgogICAgcHJpdmF0ZSBmdW5jdGlvbiBfaWRJZk5vdE51bGwoJHF1ZXN0aW9uKQogICAgewogICAgICAgIGlmIChpc19udWxsKCRxdWVzdGlvbikpIHsKICAgICAgICAgICAgcmV0dXJuIG51bGw7CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgcmV0dXJuICRxdWVzdGlvbi0+aWQ7CiAgICAgICAgfQogICAgfQp9Cg==</textarea>
+</div>
+</div><div class="saurus-overview"><ul></ul></div></div><div class="saurus-code"><div class="file-path"><span class="crumb-container"></span><i class="fa fa-fw fa-folder"></i></div><div class="saurus-editor"></div></div><div class="saurus-explorer"><div class="saurus-file-list"></div><a href="https://github.com/TwilioDevEd/appointment-reminders-laravel" target="_blank" class="explorer-get-code"> <i class="fa fa-lg fa-github-square"> </i>View Code on GitHub</a></div></div></div></div><script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script><script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script><script src="ace/ace.js"></script><script src="ace/theme-monokai.js"></script><script src="viewsaurus.js"></script></body></html>
