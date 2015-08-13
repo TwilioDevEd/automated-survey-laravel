@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\LoadSurveys',
-        'App\Console\Commands\PrepareHeroku'
+        'App\Console\Commands\InitializeHeroku'
     ];
 
     /**

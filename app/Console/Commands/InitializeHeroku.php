@@ -5,21 +5,21 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
-class PrepareHeroku extends Command
+class InitializeHeroku extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'heroku:prepare {fileName}';
+    protected $signature = 'heroku:initialize {fileName}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Migrate the database and load an initial survey';
+    protected $description = 'Forces a database migration and loads an initial survey';
 
     /**
      * Create a new command instance.
@@ -40,7 +40,7 @@ class PrepareHeroku extends Command
     {
         $fileName = $this->argument('fileName');
 
-        Artisan::call('migrate');
+        Artisan::call('migrate', ['--force']);
         $this->info('Database migrated');
 
         Artisan::call(
