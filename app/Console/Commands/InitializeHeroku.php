@@ -40,7 +40,7 @@ class InitializeHeroku extends Command
     {
         $fileName = $this->argument('fileName');
 
-        Artisan::call('migrate', ['--force']);
+        Artisan::call('migrate', ['--force' => 1]);
         $this->info('Database migrated');
 
         Artisan::call(
