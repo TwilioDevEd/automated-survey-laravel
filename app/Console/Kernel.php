@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        'App\Console\Commands\LoadSurveys'
+        'App\Console\Commands\LoadSurveys',
+        'App\Console\Commands\PrepareHeroku'
     ];
 
     /**
