@@ -48,7 +48,7 @@ class SurveyControllerTest extends TestCase
         DB::table('surveys')->delete();
 
         $response = $this->call('GET', '/first_survey');
-        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
