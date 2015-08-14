@@ -79,11 +79,11 @@ class SurveyController extends Controller
 
     private function _noSuchSurvey($voiceResponse)
     {
-        $voiceResponse->say('Could not find the survey to take');
+        $voiceResponse->say('Sorry, we could not find the survey to take');
         $voiceResponse->say('Good-bye');
         $voiceResponse->hangup();
 
-        $response = new Response($voiceResponse, 404);
+        $response = new Response($voiceResponse);
 
         return $response;
     }
