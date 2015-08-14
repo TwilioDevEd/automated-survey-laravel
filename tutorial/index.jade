@@ -4,18 +4,20 @@
       ## What does the application thing do?
 
       This [Laravel 5](http://laravel.com/) web application performs
-      automated phone surveys using Twilio's webhooks and TwiML. In addition to
-      that, the application displays the survey results. The majority
-      of the routes will be accessed by Twilio since users will
-      interact with the application mostly through the phone, not
-      through the web. Questions might specify voice responses,
-      numeric responses or yes-no responses. This application is
-      limited to performing the first survey found in the database.
+      automated phone surveys using Twilio's voice API and TwiML. In
+      addition to that, the application also displays the survey
+      results. The majority of the application's routes will be
+      accessed by Twilio itself since survey-takers will interact with
+      the application through the phone, not through the
+      web. Questions in surveys might be voice responses, numeric
+      responses or yes-no responses. A limitation in this sample
+      application is that it can only perform the first survey stored
+      the database.
 
-      In this tutorial, we'll point out the code that interacts with
-      Twilio and makes the application tick.  [Check out the project
+      In this tutorial, we'll highlight the code that interacts with
+      Twilio and in turn makes the application tick.  [Check out the project
       README on
-      GitHub](https://github.com/TwilioDevEd/surveys-laravel/readme.md)
+      GitHub](https://github.com/TwilioDevEd/automated-survey-laravel/blob/master/readme.md)
       to see how to run the code yourself.
 
       Let's get started! Click the right arrow above to advance to the next code snippet.
@@ -38,6 +40,9 @@
       `.env.example` to `.env` and configure access to your local
       database.
 
+      Now that the database is configured we can load a
+      survey into it.
+
       ---
 
       **See Also:** 
@@ -50,14 +55,17 @@
       ## Create a survey
 
       In order to perform automated surveys we first need to have some
-      questions we want to ask. For your convenience, the
-      application's repository already includes one that can be loaded
-      using the also included "survey:load" `artisan` command. Refer to the
-      application's
-      [Readme](https://github.com/TwilioDevEd/surveys-laravel/readme.md)
+      questions to ask. For your convenience, the
+      application's repository already includes one survey that can be
+      loaded into the database using the included `survey:load`
+      `artisan` command. Refer to the application's
+      [Readme](https://github.com/TwilioDevEd/automated-survey-laravel/blob/master/readme.md)
       for more details on how to fill your database with a sample
       survey. Of course you're free to write your own survey if you so
       desire. The existing `bear_survey.json` file can serve as a template.
+
+      We want users to take our survey, so next we are going implement
+      the interaction of the caller with the application.
 
       ---
 
@@ -72,22 +80,25 @@
       Whenever one of [your Twilio phone
       numbers](https://www.twilio.com/user/account/phone-numbers/incoming)
       receives a call, Twilio will make an HTTP request to the voice request
-      URL configured under it with the HTTP verb specified (either GET
+      URL configured under it with the HTTP method specified (either GET
       or POST).
 
-      For this application Twilio is configured to make a GET request to
-      the application's `/first_survey` endpoint. Since our app only
-      handles a single survey the endpoint will reply with a "303
-      Redirect" with the actual location of the survey. The URL will
-      follow `/survey/<some_id>` scheme. [Twilio is a well-behaved HTTP
+      For this application Twilio should be configured to make a GET request to
+      the application's `/first_survey` endpoint. Since our app handles
+      one and only one survey, the endpoint will reply with a "303
+      Redirect" with the location of the first survey it finds. The
+      URL for this survey should look something like `/survey/<some_id>`. [Twilio is a well-behaved HTTP
       client](https://www.twilio.com/docs/api/twiml/your_response) and
-      will follow the redirect.
+      will follow the redirect and thus make another request.
+
+      Next we will handle the request made after the redirect.
 
       ---
 
       **See Also:** 
       * [Twilio webhooks](https://www.twilio.com/platform/webhooks)
-      * [HTTP verbs](http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html)
+      * [HTTP methods](http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html)
+      * [HTTP status codes](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html)
       * [TwiML Voice: Your Response](https://www.twilio.com/docs/api/twiml/your_response)
       * [Redirects with Laravel](http://laravel.com/docs/5.1/responses#redirects)
 
@@ -101,16 +112,18 @@
       [twilio-php](http://twilio-php.readthedocs.org/en/latest/usage/twiml.html)
       library to generate the necessary TwiML.
 
-      First of all, we want to welcome the caller and thank her
-      for taking the survey and tell her the name of the survey she's
+      First of all, we want to welcome the caller, thank her
+      for taking the survey and then tell her the name of the survey she's
       about to take. After that we redirect the caller to the
-      first question and so they can start the survey. For this we
-      will first use TwiML's'
+      first question so she can start taking the survey. For this we
+      will first use TwiML's
       [`<Say>`](https://www.twilio.com/docs/api/twiml/sms/redirect) verb
       followed by the
       [`<Redirect>`](https://www.twilio.com/docs/api/twiml/sms/redirect)
-      verb. The contents of the `<Redirect>` tag is the URL of the
+      verb. The contents of the `<Redirect>` tag should be the URL of the
       survey's first question.
+
+      Now that we have welcomed the user it's time to start asking questions.
 
       ---
 
@@ -124,28 +137,35 @@
     :markdown
       ## Ask the caller a question
 
-      At this point, the Twilio client has made a request for the
-      first question. Once again, we will use "twilio-php" to generate
-      a response. First we will ask a question, say instructions on
-      how to answer the question and finally record the answer. Note
-      that instructions on how to answer depend on the type of
-      question we ask. We also record the answer differently if we
-      expect keypad input or voice input.
+      At this point the Twilio client has made a request for the first
+      question. Once again, we will use the
+      [twilio-php](https://www.twilio.com/docs/php/install) library to
+      generate a response. First we will ask a question, say
+      instructions on how to answer that question and then finally
+      record the caller's answer to the question. It's important to
+      keep in mind that instructions on how to answer a question depend on the
+      type of question we ask. We also need record the answer
+      differently if a given question requires keypad input or voice
+      input.
 
       Recording the answer is slightly more involved. If the question
       is of kind "voice" then we use the
       [`<Record>`](https://www.twilio.com/docs/api/twiml/sms/redirect)
-      verb. However, if we expect dial pad input we use the the
+      verb. However, if we expect dialpad input we use the the
       [`<Gather>`](https://www.twilio.com/docs/api/twiml/sms/redirect)
       verb. Both verbs take an `action` attribute and a `method`
-      attribute that Twilio's client will invoke after the caller's
-      answer has been recorded.
+      attribute. Twilio's client will use both attributes to make a
+      request we can use to store the caller's answer to the question.
 
-      Since we want to create a new resource the HTTP verb will be
-      `POST` for both `<Gather>` or `<Record>`. The `action` URL
-      will be `/question/<question_id>/question_response` for both
-      TwiML verbs. We also include a URL parameter `?Kind=<question
-      kind>` so we can identify the answer question when recording it.
+      Since we want to create a new resource in our server, the HTTP
+      method will be `POST` for both `<Gather>` and `<Record>`. The
+      `action` URL will be `/question/<question_id>/question_response`
+      for both TwiML verbs. We also include a `?Kind=<question kind>`
+      URL parameter so we can identify the question kind before we
+      store it in the database.
+
+      Now that the caller has answered our question we want to store
+      her answer.
 
       ---
 
@@ -156,44 +176,79 @@
   .step(data-file='app/Http/Controllers/QuestionResponseController.php'
     data-highlight='18-36')
     :markdown
-      ## Record a question's answer
+      ## Store a question's answer
 
       Now Twilio has made a POST request to the
-      `/question/<question_id>/question_response`
+      `/question/<question_id>/question_response?Kind=<question
+      kind>` URL. The request includes everything we need to record the
+      caller's answer to our question. Aside from the `<question_id>`
+      parameter, the `Kind` parameter, and the user's response,
+      Twilio includes a [wealth of
+      information](https://www.twilio.com/docs/api/twiml/twilio_request)
+      with every request. For this sample application we will store the
+      `RecordingUrl` or `Digits` parameter for voice and
+      yes-no/numeric answers accordingly. For this sample we will also
+      save the `CallSid` so we can uniquely identify a call.
+
+      Most surveys include more than a single question so we must now
+      redirect the user to the next question in this survey.
 
       ---
 
-      **See Also:** 
-      * [Accessing configuration values in Laravel](http://laravel.com/docs/5.1/installation#configuration)
-      * [Get Started with the REST API in PHP](https://twilio-php.readthedocs.org/en/latest/index.html#quickstart)
+      **See Also:**
+      [TwiML Voice: Twilio's Request'](https://www.twilio.com/docs/api/twiml/twilio_request)
 
-  .step(data-file='.env.example',
-    data-highlight='41-76')
+  .step(data-file='app/Http/Controllers/QuestionResponseController.php'
+    data-highlight='30-35')
     :markdown
-      ## Send reminder messages with the Twilio API
+      ## Redirect the user to the next question
 
-      These two private functions are called for every appointment coming up that
-      requires a reminder to be sent.  The first formats the text of the message to
-      be sent out. The second actually uses the Twilio REST API client to send out a
-      text message.
+      Now we need to locate the next question. This is rather
+      straightfoward since we have the same request as in the previous
+      step therefore we have access to the same information. We merely need
+      to find the question after the current one and reply with a "303
+      See Other" with the next question's URL as the target.
 
-      We provide a `To` parameter which is the customer's phone number, a `From`
-      parameter which is a [number in our account](https://www.twilio.com/user/account/phone-numbers/incoming),
-      and a `Body` parameter which contains the text of the message.
+      However, we need to handle the case where there's no next
+      question. In this case we simply say "good-bye" and hangup.
+
+      The application's users might want to see the answers to their
+      survey so we're implementing that next.
 
       ---
 
       **See Also:** 
-      * [Date Formatting with Carbon](http://carbon.nesbot.com/docs/#api-formatting)
-      * [Sending Text Messages in PHP](https://twilio-php.readthedocs.org/en/latest/index.html#quickstart)
+      * [HTTP status codes](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html)
+      * [Redirects with Laravel](http://laravel.com/docs/5.1/responses#redirects)
+      * [TwiML Voice: <Say>](https://www.twilio.com/docs/api/twiml/say)
+      * [TwiML Voice: <Hangup>](https://www.twilio.com/docs/api/twiml/hangup)
+
+  .step(data-file='app/Http/Controllers/SurveyController.php', data-highlight='47-59')
+    :markdown
+      ## Display the survey results
+
+      For this route we simply query the database through an Eloquent query scope and
+      then display the information within a Blade template. We display
+      a panel for every individual call. It's worth mentioning we also
+      redirect the application's root route to this route.
+
+      ---
+
+      **See Also:**
+      * [Eloquent](http://laravel.com/docs/5.1/eloquent)
+      * [Eloquent scopes](http://laravel.com/docs/5.1/eloquent#query-scopes)
+      * [Blade templates](http://laravel.com/docs/5.1/blade)
 
   .step
     :markdown
       ## Where to next?
 
-      That's it! Our Laravel application is all set to send out reminders for
-      upcoming appointments. We hope you found this sample application useful. 
-      If you're a PHP developer working with Twilio, you might enjoy these other tutorials:
+      It's done! If you have configured one of your voice-enable Twilio
+      numbers to the application built in this tutorial you should be
+      able to take the survey and see the results under root route of
+      the application. We hope you found this sample application
+      useful.  If you're a PHP developer working with Twilio, you
+      might enjoy these other tutorials:
 
       ### [Click to Call](https://www.twilio.com/docs/howto/walkthrough/click-to-call/php/laravel)  
       Put a button on your web page that connects visitors to live support or sales
