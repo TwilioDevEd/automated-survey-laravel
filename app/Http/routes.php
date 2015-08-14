@@ -21,7 +21,7 @@ Route::get(
     '/',
     ['as' => 'approot', 'uses' => 'SurveyController@showFirstSurveyResults']
 );
-Route::get(
+Route::post(
     '/first_survey',
     ['as' => 'survey.first_survey', 'uses' => 'SurveyController@showFirstSurvey']
 );
