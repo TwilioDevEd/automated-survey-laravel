@@ -118,9 +118,9 @@
       about to take. After that we redirect the caller to the
       first question so she can start taking the survey. For this we
       will first use TwiML's
-      [`<Say>`](https://www.twilio.com/docs/api/twiml/sms/redirect) verb
+      [`<Say>`](https://www.twilio.com/docs/api/twiml/say) verb
       followed by the
-      [`<Redirect>`](https://www.twilio.com/docs/api/twiml/sms/redirect)
+      [`<Redirect>`](https://www.twilio.com/docs/api/twiml/redirect)
       verb. The contents of the `<Redirect>` tag should be the URL of the
       survey's first question.
 
@@ -151,9 +151,9 @@
 
       Recording the answer is slightly more involved. If the question
       is of kind "voice" then we use the
-      [`<Record>`](https://www.twilio.com/docs/api/twiml/sms/redirect)
+      [`<Record>`](https://www.twilio.com/docs/api/twiml/record)
       verb. However, if we expect dialpad input we use the the
-      [`<Gather>`](https://www.twilio.com/docs/api/twiml/sms/redirect)
+      [`<Gather>`](https://www.twilio.com/docs/api/twiml/gather)
       verb. Both verbs take an `action` attribute and a `method`
       attribute. Twilio's client will use both attributes to make a
       request we can use to store the caller's answer to the question.
