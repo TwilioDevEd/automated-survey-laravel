@@ -1,9 +1,9 @@
 <?php
 
-if (getenv('APP_ENV') === 'testing') {
-    $dbConfig = parse_url(getenv('DATABASE_URL_TEST'));
+if ($app->environment('testing')) {
+    $dbConfig = parse_url(env('DATABASE_URL_TEST'));
 } else {
-    $dbConfig = parse_url(getenv('DATABASE_URL'));
+    $dbConfig = parse_url(env('DATABASE_URL'));
 }
 
 $host = $dbConfig['host'];
