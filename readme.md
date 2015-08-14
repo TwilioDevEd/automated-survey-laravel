@@ -13,7 +13,7 @@ automatic phone surveys.
 
 ### The web application
 
-1. Clone the repository, copy the included `env.example` as `.env` and
+1. Clone the repository, copy the included `.env.example` as `.env` and
    customize it to your needs. The application only requires a running database
 2. Use composer to install the app's dependencies by running `composer
    install` in the repo's root
@@ -37,7 +37,7 @@ running OS X you can install ngrok using Homebrew by running `brew
 install ngrok`. First you will need to run the application:
 
 ```
-php artisans serve
+php artisan serve
 ```
 
 After this you can expose the application to the wider Internet by
