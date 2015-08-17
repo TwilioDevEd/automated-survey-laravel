@@ -13,7 +13,7 @@ automatic phone surveys.
 
 ### The web application
 
-1. Clone the repository, copy the included `.env.example` as `.env` and
+1. Clone the repository, copy the included `env.example` as `.env` and
    customize it to your needs. The application only requires a running database
 2. Use composer to install the app's dependencies by running `composer
    install` in the repo's root
@@ -61,8 +61,8 @@ and open a number's configuration by clicking on it.
 ![Open a number configuration](https://raw.github.com/TwilioDevEd/automated-survey-laravel/master/number-conf.png)
 
 Next, edit the "Request URL" field under the "Voice" section and point
-it towards your ngrok-exposed application `/first_survey` route. Set
-the HTTP method to GET. If you have are trying out the Heroku
+it towards your ngrok-exposed application `/first_survey` route. Make
+sure the method is set to POST. If you have are trying out the Heroku
 application you need to point Twilio to
 `http://<your-app-name>.herokuapp.com/first_survey`. See the image
 below for an example:
