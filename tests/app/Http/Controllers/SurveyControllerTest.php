@@ -35,7 +35,7 @@ class SurveyControllerTest extends TestCase
      */
     public function testRedirectToFirstSurvey()
     {
-        $response = $this->call('GET', '/first_survey');
+        $response = $this->call('POST', '/first_survey');
         $this->assertEquals(303, $response->getStatusCode());
         $this->assertTrue($response->isRedirect());
 
@@ -47,7 +47,7 @@ class SurveyControllerTest extends TestCase
         DB::table('questions')->delete();
         DB::table('surveys')->delete();
 
-        $response = $this->call('GET', '/first_survey');
+        $response = $this->call('POST', '/first_survey');
         $this->assertEquals(200, $response->getStatusCode());
     }
 
