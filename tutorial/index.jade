@@ -11,8 +11,9 @@
       the application through the phone, not through the
       web. Questions in surveys might be voice responses, numeric
       responses or yes-no responses. A limitation in this sample
-      application is that it can only perform the first survey stored
-      the database. The source for the application [can be found in
+      application is that it can only take answers for the first
+      survey stored in the database. The source for the application
+      [can be found in
       GitHub.](https://github.com/TwilioDevEd/automated-survey-laravel)
 
       In this tutorial, we'll highlight the code that interacts with
@@ -38,7 +39,7 @@
 
       The application requirements are minimal. The only necessary
       component is a running PostgreSQL database. Rename
-      `.env.example` to `.env` and configure access to your local
+      `.env.example` to `.env` to configure access to your local
       database.
 
       Now that the database is configured we can load a
@@ -56,14 +57,15 @@
       ## Create a survey
 
       In order to perform automated surveys we first need to have some
-      questions to ask. For your convenience, the
-      application's repository already includes one survey that can be
-      loaded into the database using the included `survey:load`
-      `artisan` command. Refer to the application's
+      questions to ask. For your convenience, the application's
+      repository already includes one survey that can be loaded into
+      the database using the included `survey:load` `artisan`
+      command. Refer to the application's
       [Readme](https://github.com/TwilioDevEd/automated-survey-laravel/blob/master/readme.md)
       for more details on how to fill your database with a sample
-      survey. Of course you're free to write your own survey if you so
-      desire. The existing `bear_survey.json` file can serve as a template.
+      survey. Of course you're free to write your own survey if you
+      want.  The existing `bear_survey.json` file can serve as a
+      template.
 
       We want users to take our survey, so next we are going implement
       the interaction of the caller with the application.
@@ -84,10 +86,10 @@
       URL configured under it with the HTTP method specified (either GET
       or POST).
 
-      For this application Twilio should be configured to make a GET request to
+      For this application Twilio should be configured to make a POST request to
       the application's `/first_survey` endpoint. Since our app handles
-      one and only one survey, the endpoint will reply with a "303
-      Redirect" with the location of the first survey it finds. The
+      one and only one survey, the endpoint will reply with a redirect
+      to the location of the first survey it finds. The
       URL for this survey should look something like `/survey/<some_id>`. [Twilio is a well-behaved HTTP
       client](https://www.twilio.com/docs/api/twiml/your_response) and
       will follow the redirect and thus make another request.
@@ -144,10 +146,10 @@
       generate a response. First we will ask a question, say
       instructions on how to answer that question and then finally
       record the caller's answer to the question. It's important to
-      keep in mind that instructions on how to answer a question depend on the
-      type of question we ask. We also need record the answer
-      differently if a given question requires keypad input or voice
-      input.
+      keep in mind that instructions (for the caller) on how to answer
+      a question depend on the type of question we ask. We also need
+      record the answer differently if a given question requires
+      keypad input or voice input.
 
       Recording the answer is slightly more involved. If the question
       is of kind "voice" then we use the
@@ -207,8 +209,8 @@
       Now we need to locate the next question. This is rather
       straightfoward since we have the same request as in the previous
       step therefore we have access to the same information. We merely need
-      to find the question after the current one and reply with a "303
-      See Other" with the next question's URL as the target.
+      to find the question after the current one and reply with a
+      redirect with the next question's URL as the target.
 
       However, we need to handle the case where there's no next
       question. In this case we simply say "good-bye" and hangup.
