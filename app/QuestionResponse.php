@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class QuestionResponse extends Model
 {
 
-    protected $fillable = ['kind', 'response', 'body', 'call_sid'];
+    protected $fillable = ['type', 'response', 'session_sid'];
 
     public function question()
     {
@@ -20,7 +20,7 @@ class QuestionResponse extends Model
             ->join('questions', 'questions.id', '=', 'question_responses.question_id')
             ->join('surveys', 'surveys.id', '=', 'questions.survey_id')
             ->where('surveys.id', '=', $surveyId)
-            ->orderBy('question_responses.call_sid')
+            ->orderBy('question_responses.session_sid')
             ->orderBy('question_responses.id');
     }
 }

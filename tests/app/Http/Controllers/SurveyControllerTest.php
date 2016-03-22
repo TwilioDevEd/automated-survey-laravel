@@ -80,8 +80,8 @@ class SurveyControllerTest extends TestCase
      */
     public function testQuestionSurveyResults()
     {
-        $responseDataOne= ['kind' => 'voice', 'response' => '//faketyfake.mp3', 'call_sid' => '4l505up3run1qu3'];
-        $responseDataTwo = ['kind' => 'voice', 'response' => '//somefakesound.mp3', 'call_sid' => '5up3run1qu3'];
+        $responseDataOne= ['type' => 'voice', 'response' => '//faketyfake.mp3', 'session_sid' => '4l505up3run1qu3'];
+        $responseDataTwo = ['type' => 'voice', 'response' => '//somefakesound.mp3', 'session_sid' => '5up3run1qu3'];
 
         $question = new Question(['body' => 'What is this?', 'kind' => 'voice']);
         $question->survey()->associate($this->firstSurvey);

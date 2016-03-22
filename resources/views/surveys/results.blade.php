@@ -8,15 +8,15 @@
                 <li>
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Response from: {{ $response->first()->call_sid }}
+                            Response from: {{ $response->first()->session_sid }}
                         </div>
                         <div class="panel-body">
                             @foreach ($response as $questionResponse)
                             <ol class="list-group">
-                               <li class="list-group-item">Question: {{ $questionResponse->body }}</li>
-                               <li class="list-group-item">Answer type: {{ $questionResponse->kind }}</li>
+                               <li class="list-group-item">Question: {{ $questionResponse->question->body }}</li>
+                               <li class="list-group-item">Answer type: {{ $questionResponse->question->kind }}</li>
                                <li class="list-group-item">
-                                   @if($questionResponse->kind === 'voice')
+                                   @if($questionResponse->question->kind === 'voice')
                                        <div class="voice-response">
                                            <span class="voice-response-text">Response:</span>
                                            <i class="fa fa-play-circle fa-2x play-icon"></i>

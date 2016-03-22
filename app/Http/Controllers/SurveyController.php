@@ -38,7 +38,7 @@ class SurveyController extends Controller
         $survey = \App\Survey::find($surveyId);
         $responsesByCall = \App\QuestionResponse::responsesForSurveyByCall($surveyId)
                          ->get()
-                         ->groupBy('call_sid')
+                         ->groupBy('session_sid')
                          ->values();
 
         return response()->view(

@@ -18,8 +18,8 @@ class QuestionResponseController extends Controller
     public function store($questionId, Request $request)
     {
         $newResponse = new \App\QuestionResponse();
-        $newResponse->call_sid = $request->input('CallSid');
-        $newResponse->kind = $request->input('Kind');
+        $newResponse->session_sid = $request->input('CallSid');
+        $newResponse->type = $request->input('Kind');
         $newResponse->question_id = $questionId;
         $newResponse->response = $this->_responseFromRequest($request);
 

@@ -16,8 +16,8 @@ class CreateQuestionsResponsesTable extends Migration
             'question_responses', function ($table) {
                 $table->increments('id');
                 $table->string('response');
-                $table->string('kind');
-                $table->string('call_sid');
+                $table->string('type');
+                $table->string('session_sid');
                 $table->integer('question_id');
                 $table->timestamps();
 
