@@ -10,11 +10,6 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="#">Automated surveys</a>
             </div>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{{ route('survey.index') }}">All surveys</a></li>
-                </ul>
-            </div>
         </nav>
         <div class="container">
             @yield('content')

@@ -27,7 +27,7 @@ Route::post(
 );
 Route::resource(
     'survey', 'SurveyController',
-    ['only' => ['index', 'show']]
+    ['only' => ['show']]
 );
 Route::resource(
     'question', 'QuestionController',

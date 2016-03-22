@@ -11,3 +11,7 @@ i.play-icon {
     vertical-align: middle;
     cursor: pointer;
 }
+
+footer i {
+  color: #ff0000;
+}

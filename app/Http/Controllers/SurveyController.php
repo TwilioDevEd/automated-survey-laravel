@@ -12,17 +12,6 @@ use App\Survey;
 class SurveyController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        $allSurveys = Survey::all();
-        return response()->view('surveys.index', ['surveys' => $allSurveys]);
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param  int  $id
