@@ -17,7 +17,7 @@ class SurveyController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function show($id)
+    public function showVoice($id)
     {
         $surveyToTake = \App\Survey::find($id);
         $voiceResponse = new \Services_Twilio_Twiml();
@@ -31,6 +31,11 @@ class SurveyController extends Controller
         $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake), ['method' => 'GET']);
 
         return $voiceResponse;
+    }
+
+    public function showSms($id)
+    {
+        return 'TwiML';
     }
 
     public function showResults($surveyId)
@@ -52,9 +57,14 @@ class SurveyController extends Controller
         return $this->_redirectWithFirstSurvey('survey.results');
     }
 
-    public function showFirstSurvey()
+    public function connectVoice()
     {
-        return $this->_redirectWithFirstSurvey('survey.show');
+        return $this->_redirectWithFirstSurvey('survey.show.voice');
+    }
+
+    public function connectSms()
+    {
+        return $this->_redirectWithFirstSurvey('survey.show.voice');
     }
 
     private function _urlForFirstQuestion($survey)

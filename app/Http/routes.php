@@ -14,20 +14,28 @@ use Illuminate\Http\RedirectResponse;
 */
 
 Route::get(
-    'survey/{survey}/results',
+    '/survey/{survey}/results',
     ['as' => 'survey.results', 'uses' => 'SurveyController@showResults']
 );
 Route::get(
     '/',
-    ['as' => 'approot', 'uses' => 'SurveyController@showFirstSurveyResults']
+    ['as' => 'root', 'uses' => 'SurveyController@showFirstSurveyResults']
 );
 Route::post(
-    '/first_survey',
-    ['as' => 'survey.first_survey', 'uses' => 'SurveyController@showFirstSurvey']
+    '/voice/connect',
+    ['as' => 'voice.connect', 'uses' => 'SurveyController@connectVoice']
 );
-Route::resource(
-    'survey', 'SurveyController',
-    ['only' => ['show']]
+Route::post(
+    '/sms/connect',
+    ['as' => 'sms.connect', 'uses' => 'SurveyController@connectSms']
+);
+Route::get(
+    '/survey/{survey}/voice',
+    ['as' => 'survey.show.voice', 'uses' => 'SurveyController@showVoice']
+);
+Route::get(
+    '/survey/{survey}/sms',
+    ['as' => 'survey.show.sms', 'uses' => 'SurveyController@showSms']
 );
 Route::resource(
     'question', 'QuestionController',

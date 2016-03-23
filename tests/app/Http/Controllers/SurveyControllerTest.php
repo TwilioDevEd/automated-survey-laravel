@@ -33,14 +33,14 @@ class SurveyControllerTest extends TestCase
      *
      * @return void
      */
-    public function testRedirectToFirstSurvey()
+    public function testRedirectToFirstVoiceSurvey()
     {
-        $response = $this->call('POST', '/first_survey');
+        $response = $this->call('POST', '/voice/connect');
         $this->assertEquals(303, $response->getStatusCode());
         $this->assertTrue($response->isRedirect());
 
         $this->assertEquals(
-            route('survey.show', ['id' => $this->firstSurvey->id]),
+            route('survey.show.voice', ['id' => $this->firstSurvey->id]),
             $response->headers->get('Location')
         );
 
@@ -60,7 +60,7 @@ class SurveyControllerTest extends TestCase
     {
         $response = $this->call(
             'GET',
-            route('survey.show', ['id' => $this->firstSurvey->id])
+            route('survey.show.voice', ['id' => $this->firstSurvey->id])
         );
 
         $firstQuestion = $this->firstSurvey->questions()->first();
