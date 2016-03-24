@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Question;
+use App\QuestionResponse;
 
 class QuestionResponseController extends Controller
 {
@@ -17,7 +19,9 @@ class QuestionResponseController extends Controller
      */
     public function store($questionId, Request $request)
     {
-        $newResponse = new \App\QuestionResponse();
+        $question = Question::find($questionId);
+        $surveyId = $question->survey->id;
+        $newResponse = new QuestionResponse();
         $newResponse->session_sid = $request->input('CallSid');
         $newResponse->type = $request->input('Kind');
         $newResponse->question_id = $questionId;
@@ -30,7 +34,7 @@ class QuestionResponseController extends Controller
         if (is_null($nextQuestion)) {
             return $this->_messageAfterLastQuestion();
         } else {
-            $nextQuestionUrl = route('question.show', ['id' => $this->_questionAfter($questionId)], false);
+            $nextQuestionUrl = route('question.show.voice', ['question' => $this->_questionAfter($questionId), 'survey' => $surveyId], false);
             return redirect($nextQuestionUrl)->setStatusCode(303);
         }
     }

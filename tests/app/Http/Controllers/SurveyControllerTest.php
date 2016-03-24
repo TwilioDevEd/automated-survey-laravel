@@ -44,13 +44,28 @@ class SurveyControllerTest extends TestCase
     }
 
     /**
-     * GET redirects to first voice survey
+     * GET redirects to first sms survey
      *
      * @return void
      */
     public function testRedirectToFirstSmsSurvey()
     {
-        $response = $this->call('POST', '/sms/connect');
+        $response = $this->call('POST', '/sms/connect', ['Body' => 'Start survey']);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $redirectDocument = new SimpleXMLElement($response->getContent());
+
+        $this->assertContains(route('survey.show.sms', ['id' => $this->firstSurvey->id]), strval($redirectDocument->Redirect));
+        $this->assertEquals('GET', strval($redirectDocument->Redirect->attributes()['method']));
+    }
+
+    public function testRedirectToStoreSmsAnswer()
+    {
+        $response = $this->call(
+            'POST',
+            '/sms/connect',
+            ['Body' => 'Some answer'],
+            ['session_id' => 'message_sid', 'current_question' => '1']);
         $this->assertEquals(200, $response->getStatusCode());
 
         $redirectDocument = new SimpleXMLElement($response->getContent());
@@ -82,5 +97,37 @@ class SurveyControllerTest extends TestCase
             ),
             strval($welcomeDocument->Redirect)
         );
+    }
+
+    /**
+     * GET test question response index
+     *
+     * @return void
+     */
+    public function testQuestionSurveyResults()
+    {
+        $responseDataOne= ['type' => 'voice', 'response' => '//faketyfake.mp3', 'session_sid' => '4l505up3run1qu3'];
+        $responseDataTwo = ['type' => 'voice', 'response' => '//somefakesound.mp3', 'session_sid' => '5up3run1qu3'];
+
+        $question = new Question(['body' => 'What is this?', 'kind' => 'voice']);
+        $question->survey()->associate($this->firstSurvey);
+        $question->save();
+
+        $question->responses()->createMany([$responseDataOne, $responseDataTwo]);
+
+        $question->push();
+
+        $response = $this->call(
+            'GET',
+            route('survey.results', ['id' => $this->firstSurvey->id])
+        );
+
+        $this->assertEquals($response->original['responses']->count(), 2);
+
+        $actualResponseOne = $response->original['responses']->get(0)->toArray()[0];
+        $actualResponseTwo = $response->original['responses']->get(1)->toArray()[0];
+
+        $this->assertArraySubset($responseDataOne, $actualResponseOne);
+        $this->assertArraySubset($responseDataTwo, $actualResponseTwo);
     }
 }

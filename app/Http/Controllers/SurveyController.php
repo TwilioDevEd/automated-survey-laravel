@@ -64,7 +64,7 @@ class SurveyController extends Controller
         return response($redirectResponse)->header('Content-Type', 'application/xml');
     }
 
-    public function connectSms()
+    public function connectSms(Request $request)
     {
         $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.sms');
         return response($redirectResponse)->header('Content-Type', 'application/xml');

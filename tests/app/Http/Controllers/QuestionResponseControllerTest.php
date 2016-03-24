@@ -45,8 +45,8 @@ class QuestionResponseControllerTest extends TestCase
             $responseForQuestion
         );
 
-        $routeToNextQuestion = route('question.show', ['id' => $questionTwo->id], false);
-        $routeToNextQuestionAbsolute = route('question.show', ['id' => $questionTwo->id], true);
+        $routeToNextQuestion = route('question.show.voice', ['question' => $questionTwo->id, 'survey' => $survey->id], false);
+        $routeToNextQuestionAbsolute = route('question.show.voice', ['question' => $questionTwo->id, 'survey' => $survey->id], true);
         $this->assertContains($routeToNextQuestion, $firstResponse->getContent());
 
         $secondResponse = $this->call(

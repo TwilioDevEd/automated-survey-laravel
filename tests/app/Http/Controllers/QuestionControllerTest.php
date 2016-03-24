@@ -29,7 +29,7 @@ class QuestionControllerTest extends TestCase
 
         $response = $this->call(
             'GET',
-            route('question.show', ['id' => $question->id])
+            route('question.show.voice', ['question' => $question->id, 'survey' => $survey->id])
         );
 
         $savingUrl = route(
