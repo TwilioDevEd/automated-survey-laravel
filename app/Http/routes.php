@@ -30,11 +30,11 @@ Route::post(
     ['as' => 'sms.connect', 'uses' => 'SurveyController@connectSms']
 );
 Route::get(
-    '/survey/{survey}/voice',
+    '/survey/{id}/voice',
     ['as' => 'survey.show.voice', 'uses' => 'SurveyController@showVoice']
 );
 Route::get(
-    '/survey/{survey}/sms',
+    '/survey/{id}/sms',
     ['as' => 'survey.show.sms', 'uses' => 'SurveyController@showSms']
 );
 Route::resource(

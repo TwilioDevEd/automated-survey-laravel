@@ -9,6 +9,8 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Survey;
 
+use Services_Twilio_Twiml;
+
 class SurveyController extends Controller
 {
     /**
@@ -19,11 +21,11 @@ class SurveyController extends Controller
      */
     public function showVoice($id)
     {
-        $surveyToTake = \App\Survey::find($id);
-        $voiceResponse = new \Services_Twilio_Twiml();
+        $surveyToTake = Survey::find($id);
+        $voiceResponse = new Services_Twilio_Twiml();
 
         if (is_null($surveyToTake)) {
-            return $this->_noSuchSurvey($voiceResponse);
+            return $this->_noSuchVoiceSurvey($voiceResponse);
         }
 
         $surveyTitle = $surveyToTake->title;
@@ -59,12 +61,14 @@ class SurveyController extends Controller
 
     public function connectVoice()
     {
-        return $this->_redirectWithFirstSurvey('survey.show.voice');
+        $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.voice');
+        return response($redirectResponse)->header('Content-Type', 'application/xml');
     }
 
     public function connectSms()
     {
-        return $this->_redirectWithFirstSurvey('survey.show.voice');
+        $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.sms');
+        return response($redirectResponse)->header('Content-Type', 'application/xml');
     }
 
     private function _urlForFirstQuestion($survey)
@@ -76,7 +80,7 @@ class SurveyController extends Controller
         );
     }
 
-    private function _noSuchSurvey($voiceResponse)
+    private function _noSuchVoiceSurvey($voiceResponse)
     {
         $voiceResponse->say('Sorry, we could not find the survey to take');
         $voiceResponse->say('Good-bye');
@@ -89,14 +93,20 @@ class SurveyController extends Controller
 
     private function _redirectWithFirstSurvey($routeName)
     {
+        $response = new Services_Twilio_Twiml();
         $firstSurvey = Survey::first();
 
         if (is_null($firstSurvey)) {
-            $voiceResponse = new \Services_Twilio_Twiml();
-            return $this->_noSuchSurvey($voiceResponse);
+            if ($routeName === 'survey.show.voice') {
+                return $this->_noSuchVoiceSurvey($response);
+            }
+            return $this->_noSuchSmsSurvey($response);
         }
 
-        return redirect(route($routeName, ['id' => $firstSurvey->id]))
-                                                ->setStatusCode(303);
+        $response->redirect(
+            route($routeName, ['id' => $firstSurvey->id]),
+            ['method' => 'GET']
+        );
+        return $response;
     }
 }
