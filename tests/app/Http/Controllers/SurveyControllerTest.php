@@ -59,4 +59,28 @@ class SurveyControllerTest extends TestCase
         $this->assertEquals('GET', strval($redirectDocument->Redirect->attributes()['method']));
     }
 
+    /**
+     * GET test voice welcome response
+     *
+     * @return void
+     */
+    public function testVoiceSurveyWelcomeResponse()
+    {
+        $response = $this->call(
+            'GET',
+            route('survey.show.voice', ['id' => $this->firstSurvey->id])
+        );
+
+        $welcomeDocument = new SimpleXMLElement($response->getContent());
+        $surveyTitle = $this->firstSurvey->title;
+
+        $this->assertEquals("Hello and thank you for taking the $surveyTitle survey!", strval($welcomeDocument->Say));
+        $this->assertContains(
+            route(
+                'question.show.voice',
+                ['survey' => $this->firstSurvey->id, 'question' => $this->firstSurvey->questions()->first()->id]
+            ),
+            strval($welcomeDocument->Redirect)
+        );
+    }
 }

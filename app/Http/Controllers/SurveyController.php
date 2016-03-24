@@ -27,12 +27,11 @@ class SurveyController extends Controller
         if (is_null($surveyToTake)) {
             return $this->_noSuchVoiceSurvey($voiceResponse);
         }
-
         $surveyTitle = $surveyToTake->title;
         $voiceResponse->say("Hello and thank you for taking the $surveyTitle survey!");
-        $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake), ['method' => 'GET']);
+        $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake, 'voice'), ['method' => 'GET']);
 
-        return $voiceResponse;
+        return response($voiceResponse)->header('Content-Type', 'application/xml');
     }
 
     public function showSms($id)
@@ -71,12 +70,12 @@ class SurveyController extends Controller
         return response($redirectResponse)->header('Content-Type', 'application/xml');
     }
 
-    private function _urlForFirstQuestion($survey)
+    private function _urlForFirstQuestion($survey, $routeType)
     {
         return route(
-            'question.show',
-            ['id' => $survey->questions()->first()],
-            false
+            'question.show.' . $routeType,
+            ['survey' => $survey->id,
+             'question' => $survey->questions()->first()]
         );
     }
 
@@ -86,9 +85,12 @@ class SurveyController extends Controller
         $voiceResponse->say('Good-bye');
         $voiceResponse->hangup();
 
-        $response = new Response($voiceResponse);
+        return $voiceResponse;
+    }
 
-        return $response;
+    private function _noSuchSmsSurvey($messageResponse)
+    {
+        return $messageResponse->message('Sorry, we could not find the survey to take. Good-bye');
     }
 
     private function _redirectWithFirstSurvey($routeName)

@@ -15,9 +15,9 @@ class QuestionController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function show($id)
+    public function showVoice($surveyId, $questionId)
     {
-        $questionToAsk = \App\Question::find($id);
+        $questionToAsk = \App\Question::find($questionId);
         return $this->_commandFor($questionToAsk);
     }
 

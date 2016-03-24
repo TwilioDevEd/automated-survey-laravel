@@ -37,9 +37,13 @@ Route::get(
     '/survey/{id}/sms',
     ['as' => 'survey.show.sms', 'uses' => 'SurveyController@showSms']
 );
-Route::resource(
-    'question', 'QuestionController',
-    ['only' => ['show']]
+Route::get(
+    '/survey/{survey}/question/{question}/voice',
+    ['as' => 'question.show.voice', 'uses' => 'QuestionController@showVoice']
+);
+Route::get(
+    '/survey/{survey}/question/{question}/sms',
+    ['as' => 'question.show.sms', 'uses' => 'QuestionController@showSms']
 );
 Route::resource(
     'question.question_response', 'QuestionResponseController',
