@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Cookie;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -64,10 +65,21 @@ class SurveyController extends Controller
         return response($redirectResponse)->header('Content-Type', 'application/xml');
     }
 
-    public function connectSms(Request $request)
+    public function connectSms()
     {
+
         $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.sms');
-        return response($redirectResponse)->header('Content-Type', 'application/xml');
+        return response($redirectResponse)->header('Content-Type', 'application/xml')->withCookie('survey_session', 'someID');
+    }
+
+    private function _getNextSmsStepFromCookies(Request $request) {
+        if (strtolower($request->input('Body')) === 'start survey') {
+            return $this->_redirectWithFirstSurvey('survey.show.sms');
+        }
+        $currentQuestion = $request->cookie('current_question');
+        $surveySession = $request->cookie('survey_session');
+
+
     }
 
     private function _urlForFirstQuestion($survey, $routeType)

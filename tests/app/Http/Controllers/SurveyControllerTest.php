@@ -65,9 +65,9 @@ class SurveyControllerTest extends TestCase
             'POST',
             '/sms/connect',
             ['Body' => 'Some answer'],
-            ['session_id' => 'message_sid', 'current_question' => '1']);
-        $this->assertEquals(200, $response->getStatusCode());
+            ['survey_session' => 'message_sid', 'current_question' => '1']);
 
+        $this->assertEquals(200, $response->getStatusCode());
         $redirectDocument = new SimpleXMLElement($response->getContent());
 
         $this->assertContains(route('survey.show.sms', ['id' => $this->firstSurvey->id]), strval($redirectDocument->Redirect));

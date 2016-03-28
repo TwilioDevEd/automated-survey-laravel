@@ -17,7 +17,34 @@ class QuestionResponseController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function store($questionId, Request $request)
+    public function storeVoice($surveyId, $questionId, Request $request)
+    {
+        $question = Question::find($questionId);
+        $newResponse = new QuestionResponse();
+        $newResponse->session_sid = $request->input('CallSid');
+        $newResponse->type = $request->input('Kind');
+        $newResponse->question_id = $questionId;
+        $newResponse->response = $this->_responseFromRequest($request);
+
+        $newResponse->save();
+
+        $nextQuestion = $this->_questionAfter($questionId);
+
+        if (is_null($nextQuestion)) {
+            return $this->_messageAfterLastQuestion();
+        } else {
+            $nextQuestionUrl = route('question.show.voice', ['question' => $this->_questionAfter($questionId), 'survey' => $surveyId], false);
+            return redirect($nextQuestionUrl)->setStatusCode(303);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function storeSms($questionId, Request $request)
     {
         $question = Question::find($questionId);
         $surveyId = $question->survey->id;

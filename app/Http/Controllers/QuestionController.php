@@ -48,8 +48,9 @@ class QuestionController extends Controller
     private function _registerResponseCommand($voiceResponse, $question)
     {
         $storeResponseURL = route(
-            'question.question_response.store',
-            ['question_id' => $question->id],
+            'response.store.voice',
+            ['question' => $question->id,
+             'survey' => $question->survey->id],
             false
         );
 

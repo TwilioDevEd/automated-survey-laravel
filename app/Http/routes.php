@@ -45,7 +45,11 @@ Route::get(
     '/survey/{survey}/question/{question}/sms',
     ['as' => 'question.show.sms', 'uses' => 'QuestionController@showSms']
 );
-Route::resource(
-    'question.question_response', 'QuestionResponseController',
-    ['only' => ['store']]
+Route::post(
+    '/survey/{survey}/question/{question}/response/voice',
+    ['as' => 'response.store.voice', 'uses' => 'QuestionResponseController@storeVoice']
+);
+Route::post(
+    '/survey/{survey}/question/{question}/response/sms',
+    ['as' => 'response.store.sms', 'uses' => 'QuestionResponseController@storeSms']
 );

@@ -33,13 +33,15 @@ class QuestionControllerTest extends TestCase
         );
 
         $savingUrl = route(
-            'question.question_response.store',
-            ['question_id' => $question->id], false
+            'response.store.voice',
+            ['question' => $question->id,
+             'survey' => $survey->id], false
         );
 
         $absoluteSavingUrl = route(
-            'question.question_response.store',
-            ['question_id' => $question->id]
+            'response.store.voice',
+            ['question' => $question->id,
+             'survey' => $survey->id]
         );
 
         $this->assertContains($question->body, $response->getContent());

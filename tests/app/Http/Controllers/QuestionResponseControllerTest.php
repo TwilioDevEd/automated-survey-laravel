@@ -39,8 +39,9 @@ class QuestionResponseControllerTest extends TestCase
         $firstResponse = $this->call(
             'POST',
             route(
-                'question.question_response.store',
-                ['question_id' => $questionOne->id]
+                'response.store.voice',
+                ['question' => $questionOne->id,
+                 'survey' => $survey->id]
             ),
             $responseForQuestion
         );
@@ -52,8 +53,9 @@ class QuestionResponseControllerTest extends TestCase
         $secondResponse = $this->call(
             'POST',
             route(
-                'question.question_response.store',
-                ['question_id' => $questionTwo->id]
+                'response.store.voice',
+                ['question' => $questionTwo->id,
+                 'survey' => $survey->id]
             ),
             $responseForQuestion
         );
