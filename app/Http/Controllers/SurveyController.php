@@ -9,6 +9,7 @@ use Cookie;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Survey;
+use App\QuestionResponse;
 
 use Services_Twilio_Twiml;
 
@@ -26,24 +27,35 @@ class SurveyController extends Controller
         $voiceResponse = new Services_Twilio_Twiml();
 
         if (is_null($surveyToTake)) {
-            return $this->_noSuchVoiceSurvey($voiceResponse);
+            return $this->_responseWithXmlType($this->_noSuchVoiceSurvey($voiceResponse));
         }
         $surveyTitle = $surveyToTake->title;
         $voiceResponse->say("Hello and thank you for taking the $surveyTitle survey!");
         $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake, 'voice'), ['method' => 'GET']);
 
-        return response($voiceResponse)->header('Content-Type', 'application/xml');
+        return $this->_responseWithXmlType(response($voiceResponse));
     }
 
     public function showSms($id)
     {
-        return 'TwiML';
+        $surveyToTake = Survey::find($id);
+        $voiceResponse = new Services_Twilio_Twiml();
+
+        if (is_null($surveyToTake)) {
+            return $this->_responseWithXmlType($this->_noSuchSmsSurvey($voiceResponse));
+        }
+
+        $surveyTitle = $surveyToTake->title;
+        $voiceResponse->message("Hello and thank you for taking the $surveyTitle survey!");
+        $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake, 'sms'), ['method' => 'GET']);
+
+        return $this->_responseWithXmlType(response($voiceResponse));
     }
 
     public function showResults($surveyId)
     {
-        $survey = \App\Survey::find($surveyId);
-        $responsesByCall = \App\QuestionResponse::responsesForSurveyByCall($surveyId)
+        $survey = Survey::find($surveyId);
+        $responsesByCall = QuestionResponse::responsesForSurveyByCall($surveyId)
                          ->get()
                          ->groupBy('session_sid')
                          ->values();
@@ -65,13 +77,13 @@ class SurveyController extends Controller
     {
         $response = new Services_Twilio_Twiml();
         $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.voice', $response);
-        return response($redirectResponse)->header('Content-Type', 'application/xml');
+        return $this->_responseWithXmlType($redirectResponse);
     }
 
     public function connectSms(Request $request)
     {
         $response = $this->_getNextSmsStepFromCookies($request);
-        return $response->header('Content-Type', 'application/xml');
+        return $this->_responseWithXmlType($response);
     }
 
     private function _getNextSmsStepFromCookies($request) {
@@ -79,7 +91,7 @@ class SurveyController extends Controller
         if (strtolower($request->input('Body')) === 'start') {
             $messageSid = $request->input('MessageSid');
 
-            return response($this->_redirectWithFirstSurvey('survey.show.sms', $response))
+            return $this->_redirectWithFirstSurvey('survey.show.sms', $response)
                         ->withCookie('survey_session', $messageSid);
         }
 
@@ -87,10 +99,10 @@ class SurveyController extends Controller
         $surveySession = $request->cookie('survey_session');
 
         if (!$currentQuestion || !$surveySession) {
-            return response($this->_smsSuggestCommand($response));
+            return $this->_smsSuggestCommand($response);
         }
 
-        return response($this->_redirectToSmsQuestion($response, $currentQuestion));
+        return $this->_redirectToSmsQuestion($response, $currentQuestion);
     }
 
     private function _redirectToSmsQuestion($response, $currentQuestion) {
@@ -98,12 +110,12 @@ class SurveyController extends Controller
         $storeRoute = route('response.store.sms', ['survey' => $firstSurvey->id, 'question' => $currentQuestion]);
         $response->redirect($storeRoute, ['method' => 'POST']);
 
-        return $response;
+        return response($response);
     }
 
     private function _smsSuggestCommand($response) {
         $response->message('You have no active surveys. Reply with "Start" to begin.');
-        return $response;
+        return response($response);
     }
 
     private function _urlForFirstQuestion($survey, $routeType)
@@ -121,12 +133,13 @@ class SurveyController extends Controller
         $voiceResponse->say('Good-bye');
         $voiceResponse->hangup();
 
-        return $voiceResponse;
+        return response($voiceResponse);
     }
 
     private function _noSuchSmsSurvey($messageResponse)
     {
-        return $messageResponse->message('Sorry, we could not find the survey to take. Good-bye');
+        $messageResponse->message('Sorry, we could not find the survey to take. Good-bye');
+        return response($messageResponse);
     }
 
     private function _redirectWithFirstSurvey($routeName, $response)
@@ -144,6 +157,10 @@ class SurveyController extends Controller
             route($routeName, ['id' => $firstSurvey->id]),
             ['method' => 'GET']
         );
-        return $response;
+        return response($response);
+    }
+
+    private function _responseWithXmlType($response) {
+        return $response->header('Content-Type', 'application/xml');
     }
 }

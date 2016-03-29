@@ -21,6 +21,17 @@ class QuestionController extends Controller
         return $this->_commandFor($questionToAsk);
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function showSms($surveyId, $questionId)
+    {
+        return response('<Response><Message>You reached the first question</Message></Response>');
+    }
+
     private function _messageForQuestion($question)
     {
         $questionPhrases = collect(

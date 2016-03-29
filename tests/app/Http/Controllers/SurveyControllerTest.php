@@ -111,6 +111,43 @@ class SurveyControllerTest extends TestCase
     }
 
     /**
+     * GET test SMS welcome response
+     *
+     * @return void
+     */
+    public function testSmsSurveyWelcomeResponse()
+    {
+        $response = $this->call(
+            'GET',
+            route('survey.show.sms', ['id' => $this->firstSurvey->id])
+        );
+
+        $welcomeDocument = new SimpleXMLElement($response->getContent());
+        $surveyTitle = $this->firstSurvey->title;
+
+        $this->assertEquals("Hello and thank you for taking the $surveyTitle survey!", strval($welcomeDocument->Message));
+        $this->assertContains(
+            route(
+                'question.show.sms',
+                ['survey' => $this->firstSurvey->id, 'question' => $this->firstSurvey->questions()->first()->id]
+            ),
+            strval($welcomeDocument->Redirect)
+        );
+    }
+
+    public function testSmsSurveyWelcomeResponseNoSurvey()
+    {
+        // Only one survey exists for testing. Trying to get survey id + 1 has no match
+        $response = $this->call(
+            'GET',
+            route('survey.show.sms', ['id' => $this->firstSurvey->id + 1])
+        );
+        $welcomeDocument = new SimpleXMLElement($response->getContent());
+
+        $this->assertEquals('Sorry, we could not find the survey to take. Good-bye', strval($welcomeDocument->Message));
+    }
+
+    /**
      * GET test question response index
      *
      * @return void
