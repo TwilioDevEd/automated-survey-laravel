@@ -56,30 +56,54 @@ class SurveyController extends Controller
 
     public function showFirstSurveyResults()
     {
-        return $this->_redirectWithFirstSurvey('survey.results');
+        $firstSurvey = Survey::first();
+        return redirect(route('survey.results', ['survey' => $firstSurvey->id]))
+                ->setStatusCode(303);
     }
 
     public function connectVoice()
     {
-        $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.voice');
+        $response = new Services_Twilio_Twiml();
+        $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.voice', $response);
         return response($redirectResponse)->header('Content-Type', 'application/xml');
     }
 
-    public function connectSms()
+    public function connectSms(Request $request)
     {
-
-        $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.sms');
-        return response($redirectResponse)->header('Content-Type', 'application/xml')->withCookie('survey_session', 'someID');
+        $response = $this->_getNextSmsStepFromCookies($request);
+        return $response->header('Content-Type', 'application/xml');
     }
 
-    private function _getNextSmsStepFromCookies(Request $request) {
-        if (strtolower($request->input('Body')) === 'start survey') {
-            return $this->_redirectWithFirstSurvey('survey.show.sms');
+    private function _getNextSmsStepFromCookies($request) {
+        $response = new Services_Twilio_Twiml();
+        if (strtolower($request->input('Body')) === 'start') {
+            $messageSid = $request->input('MessageSid');
+
+            return response($this->_redirectWithFirstSurvey('survey.show.sms', $response))
+                        ->withCookie('survey_session', $messageSid);
         }
+
         $currentQuestion = $request->cookie('current_question');
         $surveySession = $request->cookie('survey_session');
 
+        if (!$currentQuestion || !$surveySession) {
+            return response($this->_smsSuggestCommand($response));
+        }
 
+        return response($this->_redirectToSmsQuestion($response, $currentQuestion));
+    }
+
+    private function _redirectToSmsQuestion($response, $currentQuestion) {
+        $firstSurvey = Survey::first();
+        $storeRoute = route('response.store.sms', ['survey' => $firstSurvey->id, 'question' => $currentQuestion]);
+        $response->redirect($storeRoute, ['method' => 'POST']);
+
+        return $response;
+    }
+
+    private function _smsSuggestCommand($response) {
+        $response->message('You have no active surveys. Reply with "Start" to begin.');
+        return $response;
     }
 
     private function _urlForFirstQuestion($survey, $routeType)
@@ -105,9 +129,8 @@ class SurveyController extends Controller
         return $messageResponse->message('Sorry, we could not find the survey to take. Good-bye');
     }
 
-    private function _redirectWithFirstSurvey($routeName)
+    private function _redirectWithFirstSurvey($routeName, $response)
     {
-        $response = new Services_Twilio_Twiml();
         $firstSurvey = Survey::first();
 
         if (is_null($firstSurvey)) {

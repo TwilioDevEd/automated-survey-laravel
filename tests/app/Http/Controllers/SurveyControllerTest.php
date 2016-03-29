@@ -50,13 +50,21 @@ class SurveyControllerTest extends TestCase
      */
     public function testRedirectToFirstSmsSurvey()
     {
-        $response = $this->call('POST', '/sms/connect', ['Body' => 'Start survey']);
+        $response = $this->call('POST', '/sms/connect', ['Body' => 'Start']);
         $this->assertEquals(200, $response->getStatusCode());
 
         $redirectDocument = new SimpleXMLElement($response->getContent());
 
         $this->assertContains(route('survey.show.sms', ['id' => $this->firstSurvey->id]), strval($redirectDocument->Redirect));
         $this->assertEquals('GET', strval($redirectDocument->Redirect->attributes()['method']));
+    }
+
+    public function testSuggestCommandWhenNoSurveyIsStarted() {
+        $response = $this->call('POST', '/sms/connect', ['Body' => 'not start command']);
+        $this->assertEquals(200, $response->getStatusCode());
+        $replyDocument = new SimpleXMLElement($response->getContent());
+
+        $this->assertEquals('You have no active surveys. Reply with "Start" to begin.', strval($replyDocument->Message));
     }
 
     public function testRedirectToStoreSmsAnswer()
@@ -70,8 +78,11 @@ class SurveyControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $redirectDocument = new SimpleXMLElement($response->getContent());
 
-        $this->assertContains(route('survey.show.sms', ['id' => $this->firstSurvey->id]), strval($redirectDocument->Redirect));
-        $this->assertEquals('GET', strval($redirectDocument->Redirect->attributes()['method']));
+        $this->assertContains(
+            route('response.store.sms', ['survey' => $this->firstSurvey->id, 'question' => 1]),
+            strval($redirectDocument->Redirect)
+        );
+        $this->assertEquals('POST', strval($redirectDocument->Redirect->attributes()['method']));
     }
 
     /**

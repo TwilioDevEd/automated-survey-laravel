@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>Results for survey: {{ $survey->title }}</h1>
-    <div class="col-md-8">
+    <div class="col-md-12">
         <ul class="list-unstyled">
             @foreach ($responses as $response)
                 <li>
