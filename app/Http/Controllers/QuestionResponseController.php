@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Question;
+use App\Survey;
 use App\QuestionResponse;
+use Services_Twilio_Twiml;
+use Cookie;
 
 class QuestionResponseController extends Controller
 {
@@ -28,12 +31,12 @@ class QuestionResponseController extends Controller
 
         $newResponse->save();
 
-        $nextQuestion = $this->_questionAfter($questionId);
+        $nextQuestion = $this->_questionAfter($question);
 
         if (is_null($nextQuestion)) {
-            return $this->_messageAfterLastQuestion();
+            return $this->_voiceMessageAfterLastQuestion();
         } else {
-            $nextQuestionUrl = route('question.show.voice', ['question' => $this->_questionAfter($questionId), 'survey' => $surveyId], false);
+            $nextQuestionUrl = route('question.show.voice', ['question' => $nextQuestion, 'survey' => $surveyId], false);
             return redirect($nextQuestionUrl)->setStatusCode(303);
         }
     }
@@ -44,26 +47,44 @@ class QuestionResponseController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function storeSms($questionId, Request $request)
+    public function storeSms($surveyId, $questionId, Request $request)
     {
         $question = Question::find($questionId);
-        $surveyId = $question->survey->id;
         $newResponse = new QuestionResponse();
-        $newResponse->session_sid = $request->input('CallSid');
-        $newResponse->type = $request->input('Kind');
+        $newResponse->session_sid = $request->cookie('survey_session');
+        $newResponse->type = 'text';
         $newResponse->question_id = $questionId;
-        $newResponse->response = $this->_responseFromRequest($question, $request);
+        $newResponse->response = $request->input('Body');
 
         $newResponse->save();
 
-        $nextQuestion = $this->_questionAfter($questionId);
+        $nextQuestion = $this->_questionAfter($question);
 
         if (is_null($nextQuestion)) {
-            return $this->_messageAfterLastQuestion();
+            return $this->_responseWithXmlType($this->_smsMessageAfterLastQuestion());
         } else {
-            $nextQuestionUrl = route('question.show.voice', ['question' => $this->_questionAfter($questionId), 'survey' => $surveyId], false);
-            return redirect($nextQuestionUrl)->setStatusCode(303);
+            $nextQuestionUrl = route('question.show.sms', ['question' => $nextQuestion, 'survey' => $surveyId]);
+            return $this->_responseWithXmlType($this->_redirectToNextSmsQuestion($nextQuestionUrl));
         }
+    }
+
+    private function _smsMessageAfterLastQuestion() {
+        $messageResponse = new Services_Twilio_Twiml();
+        $messageResponse->message(
+            "That was the last question.\n" .
+            "Thank you for participating in this survey.\n" .
+            'Good bye.'
+        );
+        return response($messageResponse)
+                   ->withCookie(Cookie::forget('survey_session'))
+                   ->withCookie(Cookie::forget('current_question'));
+    }
+
+    private function _redirectToNextSmsQuestion($route) {
+        $redirectResponse = new Services_Twilio_Twiml();
+        $redirectResponse->redirect($route, ['method' => 'GET']);
+
+        return response($redirectResponse);
     }
 
     private function _responseFromRequest($question, $request)
@@ -75,9 +96,9 @@ class QuestionResponseController extends Controller
         }
     }
 
-    private function _messageAfterLastQuestion()
+    private function _voiceMessageAfterLastQuestion()
     {
-        $voiceResponse = new \Services_Twilio_Twiml();
+        $voiceResponse = new Services_Twilio_Twiml();
         $voiceResponse->say('That was the last question');
         $voiceResponse->say('Thank you for participating in this survey');
         $voiceResponse->say('Good-bye');
@@ -86,15 +107,12 @@ class QuestionResponseController extends Controller
         return $voiceResponse;
     }
 
-    private function _questionAfter($questionId)
+    private function _questionAfter($question)
     {
-        $question = \App\Question::find($questionId);
-        $survey = \App\Survey::find($question->survey_id);
+        $survey = Survey::find($question->survey_id);
         $allQuestions = $survey->questions()->orderBy('id', 'asc')->get();
         $position = $allQuestions->search($question);
-
         $nextQuestion = $allQuestions->get($position + 1);
-
         return $this->_idIfNotNull($nextQuestion);
     }
 
@@ -105,5 +123,9 @@ class QuestionResponseController extends Controller
         } else {
             return $question->id;
         }
+    }
+
+    private function _responseWithXmlType($response) {
+        return $response->header('Content-Type', 'application/xml');
     }
 }

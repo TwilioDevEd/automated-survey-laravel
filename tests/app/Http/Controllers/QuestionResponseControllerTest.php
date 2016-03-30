@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use \App\Question;
-use \App\Survey;
+use App\Question;
+use App\Survey;
+use App\QuestionResponse;
 
 class QuestionResponseControllerTest extends TestCase
 {
@@ -57,5 +58,65 @@ class QuestionResponseControllerTest extends TestCase
         );
 
         $this->assertNotContains('Redirect', $secondResponse->getContent());
+    }
+
+    public function testStoreSmsResponse()
+    {
+        $this->assertCount(0, QuestionResponse::all());
+
+        $firstResponse = $this->call(
+            'POST',
+            route(
+                'response.store.sms',
+                ['question' => $this->questionOne->id,
+                 'survey' => $this->survey->id]
+            ),
+            ['Body' => 'Some answer'],
+            ['survey_session' => 'session_SID']
+        );
+
+        $messageDocument = new SimpleXMLElement($firstResponse->getContent());
+        $this->assertCount(1, QuestionResponse::all());
+        $questionResponse = QuestionResponse::first();
+
+        $this->assertEquals('Some answer', $questionResponse->response);
+        $this->assertEquals('session_SID', $questionResponse->session_sid);
+        $this->assertEquals('text', $questionResponse->type);
+        $this->assertEquals(
+            route('question.show.sms', ['survey' => $this->survey->id, 'question' => $this->questionTwo->id]),
+            strval($messageDocument->Redirect)
+        );
+    }
+
+    public function testStoreLastQuestionSmsAnswer() {
+        $this->assertCount(0, QuestionResponse::all());
+
+        $firstResponse = $this->call(
+            'POST',
+            route(
+                'response.store.sms',
+                ['question' => $this->questionTwo->id,
+                 'survey' => $this->survey->id]
+            ),
+            ['Body' => 'Some answer two'],
+            ['survey_session' => 'session_SID']
+        );
+
+        $cookies = $firstResponse->headers->getCookies();
+        $messageDocument = new SimpleXMLElement($firstResponse->getContent());
+        $this->assertCount(1, QuestionResponse::all());
+        $questionResponse = QuestionResponse::first();
+
+        $this->assertCount(2, $cookies);
+        $this->assertEquals('Some answer two', $questionResponse->response);
+        $this->assertEquals('session_SID', $questionResponse->session_sid);
+        $this->assertEquals('text', $questionResponse->type);
+        $this->assertEquals($this->questionTwo->id, $questionResponse->question_id);
+        $this->assertEquals(
+            "That was the last question.\n" .
+            "Thank you for participating in this survey.\n" .
+            'Good bye.',
+            strval($messageDocument->Message)
+        );
     }
 }

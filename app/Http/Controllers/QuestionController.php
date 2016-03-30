@@ -40,7 +40,7 @@ class QuestionController extends Controller
         $questionPhrases = collect(
             [
                 "voice"   => "\n\nReply to this message with your answer",
-                "yes-no"  => "\n\nReply with \"yes\" or \"no\" to this message",
+                "yes-no"  => "\n\nReply with \"1\" for YES and \"0\" for NO to this message",
                 "numeric" => "\n\nReply with a number from 1 to 10 to this message"
             ]
         );

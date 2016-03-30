@@ -15,7 +15,7 @@ class CreateQuestionsResponsesTable extends Migration
         Schema::create(
             'question_responses', function ($table) {
                 $table->increments('id');
-                $table->string('response');
+                $table->text('response');
                 $table->string('type');
                 $table->string('session_sid');
                 $table->integer('question_id');

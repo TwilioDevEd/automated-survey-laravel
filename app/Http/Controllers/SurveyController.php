@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Cookie;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -98,14 +97,21 @@ class SurveyController extends Controller
         $currentQuestion = $request->cookie('current_question');
         $surveySession = $request->cookie('survey_session');
 
-        if (!$currentQuestion || !$surveySession) {
+        if ($this->_noActiveSurvey($currentQuestion, $surveySession)) {
             return $this->_smsSuggestCommand($response);
         }
 
-        return $this->_redirectToSmsQuestion($response, $currentQuestion);
+        return $this->_redirectToStoreSmsResponse($response, $currentQuestion);
     }
 
-    private function _redirectToSmsQuestion($response, $currentQuestion) {
+    private function _noActiveSurvey($currentQuestion, $surveySession) {
+        $noCurrentQuestion = is_null($currentQuestion) || $currentQuestion == 'deleted';
+        $noSurveySession = is_null($surveySession) || $surveySession == 'deleted';
+
+        return $noCurrentQuestion || $noSurveySession;
+    }
+
+    private function _redirectToStoreSmsResponse($response, $currentQuestion) {
         $firstSurvey = $this->_getFirstSurvey();
         $storeRoute = route('response.store.sms', ['survey' => $firstSurvey->id, 'question' => $currentQuestion]);
         $response->redirect($storeRoute, ['method' => 'POST']);
