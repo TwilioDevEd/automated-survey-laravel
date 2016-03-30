@@ -17,35 +17,53 @@ class QuestionControllerTest extends TestCase
     {
         parent::setUp();
         $this->beginDatabaseTransaction();
+        $this->survey = new Survey(['title' => 'Testing survey']);
+        $this->question = new Question(['body' => 'What is this?', 'kind' => 'voice']);
+
+        $this->survey->save();
+        $this->question->survey()->associate($this->survey)->save();
     }
 
-    public function testShowQuestion()
+    public function testShowVoiceQuestion()
     {
-        $survey = new Survey(['title' => 'Testing survey']);
-        $question = new Question(['body' => 'What is this?', 'kind' => 'voice']);
-
-        $survey->save();
-        $question->survey()->associate($survey)->save();
-
         $response = $this->call(
             'GET',
-            route('question.show.voice', ['question' => $question->id, 'survey' => $survey->id])
+            route('question.show.voice', ['question' => $this->question->id, 'survey' => $this->survey->id])
         );
 
         $savingUrl = route(
             'response.store.voice',
-            ['question' => $question->id,
-             'survey' => $survey->id], false
+            ['question' => $this->question->id,
+             'survey' => $this->survey->id], false
         );
 
         $absoluteSavingUrl = route(
             'response.store.voice',
-            ['question' => $question->id,
-             'survey' => $survey->id]
+            ['question' => $this->question->id,
+             'survey' => $this->survey->id]
         );
 
-        $this->assertContains($question->body, $response->getContent());
+        $this->assertContains($this->question->body, $response->getContent());
         $this->assertContains($savingUrl . '?Kind=voice', $response->getContent());
         $this->assertNotContains($absoluteSavingUrl, $response->getContent());
+    }
+
+    public function testShowSmsQuestion() {
+        $response = $this->call(
+            'GET',
+            route('question.show.sms', ['question' => $this->question->id, 'survey' => $this->survey->id])
+        );
+        $cookies = $response->headers->getCookies();
+
+        $this->assertCount(1, $cookies);
+        $this->assertEquals('current_question', $cookies[0]->getName());
+        $this->assertEquals($this->question->id, $cookies[0]->getValue());
+
+        $messageDocument = new SimpleXMLElement($response->getContent());
+
+        $this->assertEquals(
+            $this->question->body . "\n\nReply to this message with your answer",
+            strval($messageDocument->Message)
+        );
     }
 }

@@ -21,7 +21,7 @@ class QuestionController extends Controller
     public function showVoice($surveyId, $questionId)
     {
         $questionToAsk = Question::find($questionId);
-        return $this->_commandFor($questionToAsk);
+        return $this->_responseWithXmlType($this->_commandForVoice($questionToAsk));
     }
 
     /**
@@ -32,10 +32,23 @@ class QuestionController extends Controller
      */
     public function showSms($surveyId, $questionId)
     {
-        return response('<Response><Message>You reached the first question</Message></Response>');
+        $questionToAsk = Question::find($questionId);
+        return $this->_responseWithXmlType($this->_commandForSms($questionToAsk));
     }
 
-    private function _messageForQuestion($question)
+    private function _messageForSmsQuestion($question) {
+        $questionPhrases = collect(
+            [
+                "voice"   => "\n\nReply to this message with your answer",
+                "yes-no"  => "\n\nReply with \"yes\" or \"no\" to this message",
+                "numeric" => "\n\nReply with a number from 1 to 10 to this message"
+            ]
+        );
+
+        return $questionPhrases->get($question->kind, "\n\nReply to this message with your answer");
+    }
+
+    private function _messageForVoiceQuestion($question)
     {
         $questionPhrases = collect(
             [
@@ -48,15 +61,25 @@ class QuestionController extends Controller
         return $questionPhrases->get($question->kind, "Please press a number and then the pound sign");
     }
 
-    private function _commandFor($question)
+    private function _commandForSms($question)
+    {
+        $smsResponse = new Services_Twilio_Twiml();
+
+        $messageBody = $question->body . $this->_messageForSmsQuestion($question);
+        $smsResponse->message($messageBody);
+
+        return response($smsResponse)->withCookie('current_question', $question->id);
+    }
+
+    private function _commandForVoice($question)
     {
         $voiceResponse = new Services_Twilio_Twiml();
 
         $voiceResponse->say($question->body);
-        $voiceResponse->say($this->_messageForQuestion($question));
+        $voiceResponse->say($this->_messageForVoiceQuestion($question));
         $voiceResponse = $this->_registerResponseCommand($voiceResponse, $question);
 
-        return $voiceResponse;
+        return response($voiceResponse);
     }
 
     private function _registerResponseCommand($voiceResponse, $question)
@@ -78,4 +101,7 @@ class QuestionController extends Controller
         return $voiceResponse;
     }
 
+    private function _responseWithXmlType($response) {
+        return $response->header('Content-Type', 'application/xml');
+    }
 }

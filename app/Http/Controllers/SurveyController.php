@@ -88,7 +88,7 @@ class SurveyController extends Controller
 
     private function _getNextSmsStepFromCookies($request) {
         $response = new Services_Twilio_Twiml();
-        if (strtolower($request->input('Body')) === 'start') {
+        if (strtolower(trim($request->input('Body'))) === 'start') {
             $messageSid = $request->input('MessageSid');
 
             return $this->_redirectWithFirstSurvey('survey.show.sms', $response)
