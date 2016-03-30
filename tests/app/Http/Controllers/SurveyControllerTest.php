@@ -50,11 +50,15 @@ class SurveyControllerTest extends TestCase
      */
     public function testRedirectToFirstSmsSurvey()
     {
-        $response = $this->call('POST', '/sms/connect', ['Body' => 'Start']);
+        $response = $this->call('POST', '/sms/connect', ['Body' => 'Start', 'MessageSid' => 'unique_SID']);
         $this->assertEquals(200, $response->getStatusCode());
 
         $redirectDocument = new SimpleXMLElement($response->getContent());
+        $cookies = $response->headers->getCookies();
 
+        $this->assertCount(1, $cookies);
+        $this->assertEquals('survey_session', $cookies[0]->getName());
+        $this->assertEquals('unique_SID', $cookies[0]->getValue());
         $this->assertContains(route('survey.show.sms', ['id' => $this->firstSurvey->id]), strval($redirectDocument->Redirect));
         $this->assertEquals('GET', strval($redirectDocument->Redirect->attributes()['method']));
     }
