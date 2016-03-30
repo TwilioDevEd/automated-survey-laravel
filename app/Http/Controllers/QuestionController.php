@@ -92,11 +92,11 @@ class QuestionController extends Controller
         );
 
         if ($question->kind === 'voice') {
-            $voiceResponse->record(['method' => 'POST', 'action' => $storeResponseURL . '?Kind=voice']);
+            $voiceResponse->record(['method' => 'POST', 'action' => $storeResponseURL]);
         } elseif ($question->kind === "yes-no") {
-            $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL . '?Kind=yes-no']);
+            $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL]);
         } elseif ($question->kind === "numeric") {
-            $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL . '?Kind=numeric']);
+            $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL]);
         }
         return $voiceResponse;
     }

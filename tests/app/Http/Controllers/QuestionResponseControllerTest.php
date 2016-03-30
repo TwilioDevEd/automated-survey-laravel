@@ -17,45 +17,41 @@ class QuestionResponseControllerTest extends TestCase
     {
         parent::setUp();
         $this->beginDatabaseTransaction();
+        $this->survey = new Survey(['title' => 'Testing survey']);
+        $this->questionOne = new Question(['body' => 'What is this? Question 1', 'kind' => 'voice']);
+        $this->questionTwo = new Question(['body' => 'What is that? Question 2', 'kind' => 'numeric']);
+        $this->survey->save();
+        $this->questionOne->survey()->associate($this->survey)->save();
+        $this->questionTwo->survey()->associate($this->survey)->save();
     }
 
-    public function testStoreResponse()
+    public function testStoreVoiceResponse()
     {
-        $survey = new Survey(['title' => 'Testing survey']);
-        $questionOne = new Question(['body' => 'What is this?', 'kind' => 'voice']);
-        $questionTwo = new Question(['body' => 'What is that?', 'kind' => 'voice']);
-
-        $survey->save();
-        $questionOne->survey()->associate($survey)->save();
-        $questionTwo->survey()->associate($survey)->save();
-
-
         $responseForQuestion = [
             'RecordingUrl' => '//somefake.mp3',
-            'CallSid' => '7h1515un1qu3',
-            'Kind' => 'voice'
+            'CallSid' => '7h1515un1qu3'
         ];
 
         $firstResponse = $this->call(
             'POST',
             route(
                 'response.store.voice',
-                ['question' => $questionOne->id,
-                 'survey' => $survey->id]
+                ['question' => $this->questionOne->id,
+                 'survey' => $this->survey->id]
             ),
             $responseForQuestion
         );
 
-        $routeToNextQuestion = route('question.show.voice', ['question' => $questionTwo->id, 'survey' => $survey->id], false);
-        $routeToNextQuestionAbsolute = route('question.show.voice', ['question' => $questionTwo->id, 'survey' => $survey->id], true);
+        $routeToNextQuestion = route('question.show.voice', ['question' => $this->questionTwo->id, 'survey' => $this->survey->id], false);
+        $routeToNextQuestionAbsolute = route('question.show.voice', ['question' => $this->questionTwo->id, 'survey' => $this->survey->id], true);
         $this->assertContains($routeToNextQuestion, $firstResponse->getContent());
 
         $secondResponse = $this->call(
             'POST',
             route(
                 'response.store.voice',
-                ['question' => $questionTwo->id,
-                 'survey' => $survey->id]
+                ['question' => $this->questionTwo->id,
+                 'survey' => $this->survey->id]
             ),
             $responseForQuestion
         );

@@ -22,9 +22,9 @@ class QuestionResponseController extends Controller
         $question = Question::find($questionId);
         $newResponse = new QuestionResponse();
         $newResponse->session_sid = $request->input('CallSid');
-        $newResponse->type = $request->input('Kind');
+        $newResponse->type = $question->kind;
         $newResponse->question_id = $questionId;
-        $newResponse->response = $this->_responseFromRequest($request);
+        $newResponse->response = $this->_responseFromRequest($question, $request);
 
         $newResponse->save();
 
@@ -52,7 +52,7 @@ class QuestionResponseController extends Controller
         $newResponse->session_sid = $request->input('CallSid');
         $newResponse->type = $request->input('Kind');
         $newResponse->question_id = $questionId;
-        $newResponse->response = $this->_responseFromRequest($request);
+        $newResponse->response = $this->_responseFromRequest($question, $request);
 
         $newResponse->save();
 
@@ -66,9 +66,9 @@ class QuestionResponseController extends Controller
         }
     }
 
-    private function _responseFromRequest(Request $request)
+    private function _responseFromRequest($question, $request)
     {
-        if ($request->input('Kind') === 'voice') {
+        if ($question->kind === 'voice') {
             return $request->input('RecordingUrl');
         } else {
             return $request->input('Digits');

@@ -44,7 +44,7 @@ class QuestionControllerTest extends TestCase
         );
 
         $this->assertContains($this->question->body, $response->getContent());
-        $this->assertContains($savingUrl . '?Kind=voice', $response->getContent());
+        $this->assertContains($savingUrl, $response->getContent());
         $this->assertNotContains($absoluteSavingUrl, $response->getContent());
     }
 
