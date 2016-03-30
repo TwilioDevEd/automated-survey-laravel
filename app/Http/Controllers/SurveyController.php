@@ -68,7 +68,7 @@ class SurveyController extends Controller
 
     public function showFirstSurveyResults()
     {
-        $firstSurvey = Survey::first();
+        $firstSurvey = $this->_getFirstSurvey();
         return redirect(route('survey.results', ['survey' => $firstSurvey->id]))
                 ->setStatusCode(303);
     }
@@ -106,7 +106,7 @@ class SurveyController extends Controller
     }
 
     private function _redirectToSmsQuestion($response, $currentQuestion) {
-        $firstSurvey = Survey::first();
+        $firstSurvey = $this->_getFirstSurvey();
         $storeRoute = route('response.store.sms', ['survey' => $firstSurvey->id, 'question' => $currentQuestion]);
         $response->redirect($storeRoute, ['method' => 'POST']);
 
@@ -123,7 +123,7 @@ class SurveyController extends Controller
         return route(
             'question.show.' . $routeType,
             ['survey' => $survey->id,
-             'question' => $survey->questions()->first()]
+             'question' => $survey->questions()->orderBy('id')->first()->id]
         );
     }
 
@@ -144,7 +144,7 @@ class SurveyController extends Controller
 
     private function _redirectWithFirstSurvey($routeName, $response)
     {
-        $firstSurvey = Survey::first();
+        $firstSurvey = $this->_getFirstSurvey();
 
         if (is_null($firstSurvey)) {
             if ($routeName === 'survey.show.voice') {
@@ -158,6 +158,10 @@ class SurveyController extends Controller
             ['method' => 'GET']
         );
         return response($response);
+    }
+
+    private function _getFirstSurvey() {
+        return Survey::orderBy('id', 'DESC')->get()->first();
     }
 
     private function _responseWithXmlType($response) {

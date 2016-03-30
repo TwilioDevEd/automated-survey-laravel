@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\Question;
+use Services_Twilio_Twiml;
+
 class QuestionController extends Controller
 {
     /**
@@ -17,7 +20,7 @@ class QuestionController extends Controller
      */
     public function showVoice($surveyId, $questionId)
     {
-        $questionToAsk = \App\Question::find($questionId);
+        $questionToAsk = Question::find($questionId);
         return $this->_commandFor($questionToAsk);
     }
 
@@ -47,7 +50,7 @@ class QuestionController extends Controller
 
     private function _commandFor($question)
     {
-        $voiceResponse = new \Services_Twilio_Twiml();
+        $voiceResponse = new Services_Twilio_Twiml();
 
         $voiceResponse->say($question->body);
         $voiceResponse->say($this->_messageForQuestion($question));
