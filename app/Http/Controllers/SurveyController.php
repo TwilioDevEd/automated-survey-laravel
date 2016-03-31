@@ -14,43 +14,6 @@ use Services_Twilio_Twiml;
 
 class SurveyController extends Controller
 {
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function showVoice($id)
-    {
-        $surveyToTake = Survey::find($id);
-        $voiceResponse = new Services_Twilio_Twiml();
-
-        if (is_null($surveyToTake)) {
-            return $this->_responseWithXmlType($this->_noSuchVoiceSurvey($voiceResponse));
-        }
-        $surveyTitle = $surveyToTake->title;
-        $voiceResponse->say("Hello and thank you for taking the $surveyTitle survey!");
-        $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake, 'voice'), ['method' => 'GET']);
-
-        return $this->_responseWithXmlType(response($voiceResponse));
-    }
-
-    public function showSms($id)
-    {
-        $surveyToTake = Survey::find($id);
-        $voiceResponse = new Services_Twilio_Twiml();
-
-        if (is_null($surveyToTake)) {
-            return $this->_responseWithXmlType($this->_noSuchSmsSurvey($voiceResponse));
-        }
-
-        $surveyTitle = $surveyToTake->title;
-        $voiceResponse->message("Hello and thank you for taking the $surveyTitle survey!");
-        $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake, 'sms'), ['method' => 'GET']);
-
-        return $this->_responseWithXmlType(response($voiceResponse));
-    }
-
     public function showResults($surveyId)
     {
         $survey = Survey::find($surveyId);
@@ -79,6 +42,49 @@ class SurveyController extends Controller
         return $this->_responseWithXmlType($redirectResponse);
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function showVoice($id)
+    {
+        $surveyToTake = Survey::find($id);
+        $voiceResponse = new Services_Twilio_Twiml();
+
+        if (is_null($surveyToTake)) {
+            return $this->_responseWithXmlType($this->_noSuchVoiceSurvey($voiceResponse));
+        }
+        $surveyTitle = $surveyToTake->title;
+        $voiceResponse->say("Hello and thank you for taking the $surveyTitle survey!");
+        $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake, 'voice'), ['method' => 'GET']);
+
+        return $this->_responseWithXmlType(response($voiceResponse));
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function showSms($id)
+    {
+        $surveyToTake = Survey::find($id);
+        $voiceResponse = new Services_Twilio_Twiml();
+
+        if (is_null($surveyToTake)) {
+            return $this->_responseWithXmlType($this->_noSuchSmsSurvey($voiceResponse));
+        }
+
+        $surveyTitle = $surveyToTake->title;
+        $voiceResponse->message("Hello and thank you for taking the $surveyTitle survey!");
+        $voiceResponse->redirect($this->_urlForFirstQuestion($surveyToTake, 'sms'), ['method' => 'GET']);
+
+        return $this->_responseWithXmlType(response($voiceResponse));
+    }
+
     public function connectSms(Request $request)
     {
         $response = $this->_getNextSmsStepFromCookies($request);
@@ -104,6 +110,24 @@ class SurveyController extends Controller
         return $this->_redirectToStoreSmsResponse($response, $currentQuestion);
     }
 
+    private function _redirectWithFirstSurvey($routeName, $response)
+    {
+        $firstSurvey = $this->_getFirstSurvey();
+
+        if (is_null($firstSurvey)) {
+            if ($routeName === 'survey.show.voice') {
+                return $this->_noSuchVoiceSurvey($response);
+            }
+            return $this->_noSuchSmsSurvey($response);
+        }
+
+        $response->redirect(
+            route($routeName, ['id' => $firstSurvey->id]),
+            ['method' => 'GET']
+        );
+        return response($response);
+    }
+
     private function _noActiveSurvey($currentQuestion, $surveySession) {
         $noCurrentQuestion = is_null($currentQuestion) || $currentQuestion == 'deleted';
         $noSurveySession = is_null($surveySession) || $surveySession == 'deleted';
@@ -124,6 +148,12 @@ class SurveyController extends Controller
         return response($response);
     }
 
+    private function _noSuchSmsSurvey($messageResponse)
+    {
+        $messageResponse->message('Sorry, we could not find the survey to take. Good-bye');
+        return response($messageResponse);
+    }
+
     private function _urlForFirstQuestion($survey, $routeType)
     {
         return route(
@@ -140,30 +170,6 @@ class SurveyController extends Controller
         $voiceResponse->hangup();
 
         return response($voiceResponse);
-    }
-
-    private function _noSuchSmsSurvey($messageResponse)
-    {
-        $messageResponse->message('Sorry, we could not find the survey to take. Good-bye');
-        return response($messageResponse);
-    }
-
-    private function _redirectWithFirstSurvey($routeName, $response)
-    {
-        $firstSurvey = $this->_getFirstSurvey();
-
-        if (is_null($firstSurvey)) {
-            if ($routeName === 'survey.show.voice') {
-                return $this->_noSuchVoiceSurvey($response);
-            }
-            return $this->_noSuchSmsSurvey($response);
-        }
-
-        $response->redirect(
-            route($routeName, ['id' => $firstSurvey->id]),
-            ['method' => 'GET']
-        );
-        return response($response);
     }
 
     private function _getFirstSurvey() {

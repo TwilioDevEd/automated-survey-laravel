@@ -43,9 +43,19 @@ class QuestionControllerTest extends TestCase
              'survey' => $this->survey->id]
         );
 
+        /*$transcriptionUrl = route(
+            'response.update',
+            []
+        );*/
+
+        $responseDocument = new SimpleXMLElement($response->getContent());
+
         $this->assertContains($this->question->body, $response->getContent());
         $this->assertContains($savingUrl, $response->getContent());
         $this->assertNotContains($absoluteSavingUrl, $response->getContent());
+        //$this->assertEquals()
+        //$this->assertEquals('GET', strval($redirectDocument->Redirect->attributes()['method']));
+
     }
 
     public function testShowSmsQuestion() {

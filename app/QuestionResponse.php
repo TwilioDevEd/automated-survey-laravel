@@ -14,6 +14,11 @@ class QuestionResponse extends Model
         return $this->belongsTo('App\Question');
     }
 
+    public function responseTranscription()
+    {
+        return $this->hasOne('App\ResponseTranscription');
+    }
+
     public function scopeResponsesForSurveyByCall($query, $surveyId)
     {
         return $query

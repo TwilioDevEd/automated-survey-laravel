@@ -119,4 +119,50 @@ class QuestionResponseControllerTest extends TestCase
             strval($messageDocument->Message)
         );
     }
+
+    public function testUpdateResponseWithTranscription() {
+        $questionResponse = $this->questionOne->responses()->create(
+            ['response' => 'Some answer',
+             'type' => 'voice',
+             'session_sid' => 'some SID']
+        );
+        $this->assertNull($questionResponse->responseTranscription);
+
+        $response = $this->call(
+            'PUT',
+            route(
+                'response.update',
+                ['survey' => $this->survey->id, 'question' => $this->questionOne->id, 'response' => $questionResponse->id]
+            ),
+            ['TranscriptionText' => 'transcribed answer!', 'TranscriptionStatus' => 'completed']
+        );
+        $questionResponse = $questionResponse->fresh();
+        $transcription = $questionResponse->responseTranscription;
+
+        $this->assertNotNull($transcription);
+        $this->assertEquals('transcribed answer!', $transcription->transcription);
+    }
+
+    public function testUpdateResponseWithTranscriptionError() {
+        $questionResponse = $this->questionOne->responses()->create(
+            ['response' => 'Some answer',
+             'type' => 'voice',
+             'session_sid' => 'some SID']
+        );
+        $this->assertNull($questionResponse->responseTranscription);
+
+        $response = $this->call(
+            'PUT',
+            route(
+                'response.update',
+                ['survey' => $this->survey->id, 'question' => $this->questionOne->id, 'response' => $questionResponse->id]
+            ),
+            ['TranscriptionText' => 'Some error occurred', 'TranscriptionStatus' => 'failed']
+        );
+        $questionResponse = $questionResponse->fresh();
+        $transcription = $questionResponse->responseTranscription;
+
+        $this->assertNotNull($transcription);
+        $this->assertEquals('An error occurred while transcribing the answer', $transcription->transcription);
+    }
 }

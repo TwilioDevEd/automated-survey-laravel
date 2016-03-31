@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Question;
 use App\Survey;
 use App\QuestionResponse;
+use App\ResponseTranscription;
 use Services_Twilio_Twiml;
 use Cookie;
 
@@ -24,7 +25,7 @@ class QuestionResponseController extends Controller
     {
         $question = Question::find($questionId);
         $newResponse = $question->responses()->create(
-            ['response' => $this->_responseFromRequest($question, $request),
+            ['response' => $this->_responseFromVoiceRequest($question, $request),
              'type' => 'voice',
              'session_sid' => $request->input('CallSid')]
         );
@@ -32,7 +33,7 @@ class QuestionResponseController extends Controller
         $nextQuestion = $this->_questionAfter($question);
 
         if (is_null($nextQuestion)) {
-            return $this->_voiceMessageAfterLastQuestion();
+            return $this->_responseWithXmlType($this->_voiceMessageAfterLastQuestion());
         } else {
             return $this->_responseWithXmlType(
                 $this->_redirectToQuestion($nextQuestion, 'question.show.voice')
@@ -66,19 +67,34 @@ class QuestionResponseController extends Controller
         }
     }
 
-    private function _smsMessageAfterLastQuestion() {
-        $messageResponse = new Services_Twilio_Twiml();
-        $messageResponse->message(
-            "That was the last question.\n" .
-            "Thank you for participating in this survey.\n" .
-            'Good bye.'
+    public function update($surveyId, $questionId, $responseId, Request $request)
+    {
+        $questionResponse = QuestionResponse::find($responseId);
+        $questionResponse->responseTranscription()->create(
+            ['transcription' => $this->_transcriptionMessageIfCompleted($request)]
         );
-        return response($messageResponse)
-                   ->withCookie(Cookie::forget('survey_session'))
-                   ->withCookie(Cookie::forget('current_question'));
     }
 
-    private function _redirectToQuestion($question, $route) {
+    private function _responseFromVoiceRequest($question, $request)
+    {
+        if ($question->kind === 'voice') {
+            return $request->input('RecordingUrl');
+        } else {
+            return $request->input('Digits');
+        }
+    }
+
+    private function _questionAfter($question)
+    {
+        $survey = Survey::find($question->survey_id);
+        $allQuestions = $survey->questions()->orderBy('id', 'asc')->get();
+        $position = $allQuestions->search($question);
+        $nextQuestion = $allQuestions->get($position + 1);
+        return $nextQuestion;
+    }
+
+    private function _redirectToQuestion($question, $route)
+    {
         $questionUrl = route(
             $route,
             ['question' => $question->id, 'survey' => $question->survey->id]
@@ -87,15 +103,6 @@ class QuestionResponseController extends Controller
         $redirectResponse->redirect($questionUrl, ['method' => 'GET']);
 
         return response($redirectResponse);
-    }
-
-    private function _responseFromRequest($question, $request)
-    {
-        if ($question->kind === 'voice') {
-            return $request->input('RecordingUrl');
-        } else {
-            return $request->input('Digits');
-        }
     }
 
     private function _voiceMessageAfterLastQuestion()
@@ -109,16 +116,28 @@ class QuestionResponseController extends Controller
         return $voiceResponse;
     }
 
-    private function _questionAfter($question)
-    {
-        $survey = Survey::find($question->survey_id);
-        $allQuestions = $survey->questions()->orderBy('id', 'asc')->get();
-        $position = $allQuestions->search($question);
-        $nextQuestion = $allQuestions->get($position + 1);
-        return $nextQuestion;
+    private function _smsMessageAfterLastQuestion() {
+        $messageResponse = new Services_Twilio_Twiml();
+        $messageResponse->message(
+            "That was the last question.\n" .
+            "Thank you for participating in this survey.\n" .
+            'Good bye.'
+        );
+        return response($messageResponse)
+                   ->withCookie(Cookie::forget('survey_session'))
+                   ->withCookie(Cookie::forget('current_question'));
     }
 
-    private function _responseWithXmlType($response) {
+    private function _transcriptionMessageIfCompleted($request)
+    {
+        if ($request->input('TranscriptionStatus') === 'completed') {
+            return $request->input('TranscriptionText');
+        }
+        return 'An error occurred while transcribing the answer';
+    }
+
+    private function _responseWithXmlType($response)
+    {
         return $response->header('Content-Type', 'application/xml');
     }
 }
