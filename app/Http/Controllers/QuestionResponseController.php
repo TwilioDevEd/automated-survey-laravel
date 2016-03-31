@@ -23,21 +23,20 @@ class QuestionResponseController extends Controller
     public function storeVoice($surveyId, $questionId, Request $request)
     {
         $question = Question::find($questionId);
-        $newResponse = new QuestionResponse();
-        $newResponse->session_sid = $request->input('CallSid');
-        $newResponse->type = $question->kind;
-        $newResponse->question_id = $questionId;
-        $newResponse->response = $this->_responseFromRequest($question, $request);
-
-        $newResponse->save();
+        $newResponse = $question->responses()->create(
+            ['response' => $this->_responseFromRequest($question, $request),
+             'type' => 'voice',
+             'session_sid' => $request->input('CallSid')]
+        );
 
         $nextQuestion = $this->_questionAfter($question);
 
         if (is_null($nextQuestion)) {
             return $this->_voiceMessageAfterLastQuestion();
         } else {
-            $nextQuestionUrl = route('question.show.voice', ['question' => $nextQuestion, 'survey' => $surveyId], false);
-            return redirect($nextQuestionUrl)->setStatusCode(303);
+            return $this->_responseWithXmlType(
+                $this->_redirectToQuestion($nextQuestion, 'question.show.voice')
+            );
         }
     }
 
@@ -50,21 +49,20 @@ class QuestionResponseController extends Controller
     public function storeSms($surveyId, $questionId, Request $request)
     {
         $question = Question::find($questionId);
-        $newResponse = new QuestionResponse();
-        $newResponse->session_sid = $request->cookie('survey_session');
-        $newResponse->type = 'text';
-        $newResponse->question_id = $questionId;
-        $newResponse->response = $request->input('Body');
-
-        $newResponse->save();
+        $newResponse = $question->responses()->create(
+            ['response' => $request->input('Body'),
+             'type' => 'text',
+             'session_sid' => $request->cookie('survey_session')]
+        );
 
         $nextQuestion = $this->_questionAfter($question);
 
         if (is_null($nextQuestion)) {
             return $this->_responseWithXmlType($this->_smsMessageAfterLastQuestion());
         } else {
-            $nextQuestionUrl = route('question.show.sms', ['question' => $nextQuestion, 'survey' => $surveyId]);
-            return $this->_responseWithXmlType($this->_redirectToNextSmsQuestion($nextQuestionUrl));
+            return $this->_responseWithXmlType(
+                $this->_redirectToQuestion($nextQuestion, 'question.show.sms')
+            );
         }
     }
 
@@ -80,9 +78,13 @@ class QuestionResponseController extends Controller
                    ->withCookie(Cookie::forget('current_question'));
     }
 
-    private function _redirectToNextSmsQuestion($route) {
+    private function _redirectToQuestion($question, $route) {
+        $questionUrl = route(
+            $route,
+            ['question' => $question->id, 'survey' => $question->survey->id]
+        );
         $redirectResponse = new Services_Twilio_Twiml();
-        $redirectResponse->redirect($route, ['method' => 'GET']);
+        $redirectResponse->redirect($questionUrl, ['method' => 'GET']);
 
         return response($redirectResponse);
     }
@@ -113,16 +115,7 @@ class QuestionResponseController extends Controller
         $allQuestions = $survey->questions()->orderBy('id', 'asc')->get();
         $position = $allQuestions->search($question);
         $nextQuestion = $allQuestions->get($position + 1);
-        return $this->_idIfNotNull($nextQuestion);
-    }
-
-    private function _idIfNotNull($question)
-    {
-        if (is_null($question)) {
-            return null;
-        } else {
-            return $question->id;
-        }
+        return $nextQuestion;
     }
 
     private function _responseWithXmlType($response) {
