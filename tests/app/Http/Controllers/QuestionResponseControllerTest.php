@@ -83,7 +83,7 @@ class QuestionResponseControllerTest extends TestCase
 
         $this->assertEquals('Some answer', $questionResponse->response);
         $this->assertEquals('session_SID', $questionResponse->session_sid);
-        $this->assertEquals('text', $questionResponse->type);
+        $this->assertEquals('sms', $questionResponse->type);
         $this->assertEquals(
             route('question.show.sms', ['survey' => $this->survey->id, 'question' => $this->questionTwo->id]),
             strval($messageDocument->Redirect)
@@ -112,7 +112,7 @@ class QuestionResponseControllerTest extends TestCase
         $this->assertCount(2, $cookies);
         $this->assertEquals('Some answer two', $questionResponse->response);
         $this->assertEquals('session_SID', $questionResponse->session_sid);
-        $this->assertEquals('text', $questionResponse->type);
+        $this->assertEquals('sms', $questionResponse->type);
         $this->assertEquals($this->questionTwo->id, $questionResponse->question_id);
         $this->assertEquals(
             "That was the last question.\n" .

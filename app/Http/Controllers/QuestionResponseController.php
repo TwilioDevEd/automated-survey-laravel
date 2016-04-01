@@ -52,7 +52,7 @@ class QuestionResponseController extends Controller
         $question = Question::find($questionId);
         $newResponse = $question->responses()->create(
             ['response' => $request->input('Body'),
-             'type' => 'text',
+             'type' => 'sms',
              'session_sid' => $request->cookie('survey_session')]
         );
 
