@@ -39,9 +39,9 @@ class QuestionController extends Controller
     private function _messageForSmsQuestion($question) {
         $questionPhrases = collect(
             [
-                "voice"   => "\n\nReply to this message with your answer",
-                "yes-no"  => "\n\nReply with \"1\" for YES and \"0\" for NO to this message",
-                "numeric" => "\n\nReply with a number from 1 to 10 to this message"
+                'free-answer'   => "\n\nReply to this message with your answer",
+                'yes-no'  => "\n\nReply with \"1\" for YES and \"0\" for NO to this message",
+                'numeric' => "\n\nReply with a number from 1 to 10 to this message"
             ]
         );
 
@@ -52,9 +52,9 @@ class QuestionController extends Controller
     {
         $questionPhrases = collect(
             [
-                "voice"   => "Please record your answer after the beep and then hit the pound sign",
-                "yes-no"  => "Please press the one key for yes and the zero key for no and then hit the pound sign",
-                "numeric" => "Please press a number between 1 and 10 and then hit the pound sign"
+                'free-answer'   => "Please record your answer after the beep and then hit the pound sign",
+                'yes-no'  => "Please press the one key for yes and the zero key for no and then hit the pound sign",
+                'numeric' => "Please press a number between 1 and 10 and then hit the pound sign"
             ]
         );
 
@@ -91,7 +91,7 @@ class QuestionController extends Controller
             false
         );
 
-        if ($question->kind === 'voice') {
+        if ($question->kind === 'free-answer') {
             $transcribeUrl = route(
                 'response.transcription.store',
                 ['question' => $question->id,
@@ -103,9 +103,9 @@ class QuestionController extends Controller
                  'transcribe' => true,
                  'transcribeCallback' => $transcribeUrl]
             );
-        } elseif ($question->kind === "yes-no") {
+        } elseif ($question->kind === 'yes-no') {
             $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL]);
-        } elseif ($question->kind === "numeric") {
+        } elseif ($question->kind === 'numeric') {
             $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL]);
         }
         return $voiceResponse;

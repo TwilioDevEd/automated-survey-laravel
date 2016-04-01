@@ -161,7 +161,7 @@ class SurveyControllerTest extends TestCase
         $responseDataOne= ['type' => 'voice', 'response' => '//faketyfake.mp3', 'session_sid' => '4l505up3run1qu3'];
         $responseDataTwo = ['type' => 'voice', 'response' => '//somefakesound.mp3', 'session_sid' => '5up3run1qu3'];
 
-        $question = new Question(['body' => 'What is this?', 'kind' => 'voice']);
+        $question = new Question(['body' => 'What is this?', 'kind' => 'free-answer']);
         $question->survey()->associate($this->firstSurvey);
         $question->save();
 

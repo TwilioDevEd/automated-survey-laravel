@@ -19,7 +19,7 @@ class QuestionResponseControllerTest extends TestCase
         parent::setUp();
         $this->beginDatabaseTransaction();
         $this->survey = new Survey(['title' => 'Testing survey']);
-        $this->questionOne = new Question(['body' => 'What is this? Question 1', 'kind' => 'voice']);
+        $this->questionOne = new Question(['body' => 'What is this? Question 1', 'kind' => 'free-answer']);
         $this->questionTwo = new Question(['body' => 'What is that? Question 2', 'kind' => 'numeric']);
         $this->survey->save();
         $this->questionOne->survey()->associate($this->survey)->save();

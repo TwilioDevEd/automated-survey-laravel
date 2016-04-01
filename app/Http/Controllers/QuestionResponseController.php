@@ -79,7 +79,7 @@ class QuestionResponseController extends Controller
 
     private function _responseFromVoiceRequest($question, $request)
     {
-        if ($question->kind === 'voice') {
+        if ($question->kind === 'free-answer') {
             return $request->input('RecordingUrl');
         } else {
             return $request->input('Digits');

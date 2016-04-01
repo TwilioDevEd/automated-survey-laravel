@@ -16,7 +16,7 @@ class CreateQuestionsTable extends Migration
             'questions', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('body');
-                $table->string('kind');
+                $table->enum('kind', ['free-answer', 'yes-no', 'numeric']);
                 $table->integer('survey_id');
                 $table->timestamps();
 
