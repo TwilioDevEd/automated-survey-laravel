@@ -49,9 +49,13 @@ class QuestionResponseController extends Controller
      */
     public function storeSms($surveyId, $questionId, Request $request)
     {
+        $answer = trim($request->input('Body'));
         $question = Question::find($questionId);
+        if ($question->kind === 'yes-no') {
+            $answer = strtolower($answer) === 'yes' ? 1 : 0;
+        }
         $newResponse = $question->responses()->create(
-            ['response' => $request->input('Body'),
+            ['response' => $answer,
              'type' => 'sms',
              'session_sid' => $request->cookie('survey_session')]
         );

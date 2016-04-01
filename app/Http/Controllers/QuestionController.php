@@ -39,9 +39,9 @@ class QuestionController extends Controller
     private function _messageForSmsQuestion($question) {
         $questionPhrases = collect(
             [
-                'free-answer'   => "\n\nReply to this message with your answer",
-                'yes-no'  => "\n\nReply with \"1\" for YES and \"0\" for NO to this message",
-                'numeric' => "\n\nReply with a number from 1 to 10 to this message"
+                'free-answer' => "\n\nReply to this message with your answer",
+                'yes-no'      => "\n\nReply with \"YES\" or \"NO\" to this message",
+                'numeric'     => "\n\nReply with a number from 1 to 10 to this message"
             ]
         );
 
@@ -52,9 +52,9 @@ class QuestionController extends Controller
     {
         $questionPhrases = collect(
             [
-                'free-answer'   => "Please record your answer after the beep and then hit the pound sign",
-                'yes-no'  => "Please press the one key for yes and the zero key for no and then hit the pound sign",
-                'numeric' => "Please press a number between 1 and 10 and then hit the pound sign"
+                'free-answer' => "Please record your answer after the beep and then hit the pound sign",
+                'yes-no'      => "Please press the one key for yes and the zero key for no and then hit the pound sign",
+                'numeric'     => "Please press a number between 1 and 10 and then hit the pound sign"
             ]
         );
 

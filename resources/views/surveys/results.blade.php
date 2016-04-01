@@ -31,6 +31,12 @@
                                 <i class="fa fa-play-circle fa-2x play-icon"></i>
                                 <audio class="voice-response" src="{{ $questionResponse->response }}"></audio>
                             </div>
+                            @elseif($questionResponse->question->kind === 'yes-no')
+                                @if($questionResponse->response == 1)
+                                YES
+                                @else
+                                NO
+                                @endif
                             @else
                             {{ $questionResponse->response }}
                             @endif
