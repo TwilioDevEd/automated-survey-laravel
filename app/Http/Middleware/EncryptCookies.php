@@ -12,6 +12,7 @@ class EncryptCookies extends BaseEncrypter
      * @var array
      */
     protected $except = [
-        //
+        'current_question',
+        'survey_session'
     ];
 }

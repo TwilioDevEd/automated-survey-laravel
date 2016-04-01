@@ -14,26 +14,46 @@ use Illuminate\Http\RedirectResponse;
 */
 
 Route::get(
-    'survey/{survey}/results',
+    '/survey/{survey}/results',
     ['as' => 'survey.results', 'uses' => 'SurveyController@showResults']
 );
 Route::get(
     '/',
-    ['as' => 'approot', 'uses' => 'SurveyController@showFirstSurveyResults']
+    ['as' => 'root', 'uses' => 'SurveyController@showFirstSurveyResults']
 );
 Route::post(
-    '/first_survey',
-    ['as' => 'survey.first_survey', 'uses' => 'SurveyController@showFirstSurvey']
+    '/voice/connect',
+    ['as' => 'voice.connect', 'uses' => 'SurveyController@connectVoice']
 );
-Route::resource(
-    'survey', 'SurveyController',
-    ['only' => ['show']]
+Route::post(
+    '/sms/connect',
+    ['as' => 'sms.connect', 'uses' => 'SurveyController@connectSms']
 );
-Route::resource(
-    'question', 'QuestionController',
-    ['only' => ['show']]
+Route::get(
+    '/survey/{id}/voice',
+    ['as' => 'survey.show.voice', 'uses' => 'SurveyController@showVoice']
 );
-Route::resource(
-    'question.question_response', 'QuestionResponseController',
-    ['only' => ['store']]
+Route::get(
+    '/survey/{id}/sms',
+    ['as' => 'survey.show.sms', 'uses' => 'SurveyController@showSms']
+);
+Route::get(
+    '/survey/{survey}/question/{question}/voice',
+    ['as' => 'question.show.voice', 'uses' => 'QuestionController@showVoice']
+);
+Route::get(
+    '/survey/{survey}/question/{question}/sms',
+    ['as' => 'question.show.sms', 'uses' => 'QuestionController@showSms']
+);
+Route::post(
+    '/survey/{survey}/question/{question}/response/voice',
+    ['as' => 'response.store.voice', 'uses' => 'QuestionResponseController@storeVoice']
+);
+Route::post(
+    '/survey/{survey}/question/{question}/response/sms',
+    ['as' => 'response.store.sms', 'uses' => 'QuestionResponseController@storeSms']
+);
+Route::post(
+    '/survey/{survey}/question/{question}/response/transcription',
+    ['as' => 'response.transcription.store', 'uses' => 'QuestionResponseController@storeTranscription']
 );

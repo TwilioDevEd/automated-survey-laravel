@@ -11,10 +11,10 @@
                 <a class="navbar-brand" href="#">Automated surveys</a>
             </div>
         </nav>
-        <div class="container">
+        <div class="container-fluid">
             @yield('content')
         </div>
-        <footer class="container">
+        <footer class="container text-center">
             Made with <i class="fa fa-heart"></i> by your pals
             <a href="http://www.twilio.com">@twilio</a>
         </footer>

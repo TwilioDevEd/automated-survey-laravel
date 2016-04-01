@@ -6,6 +6,12 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Question;
+use App\Survey;
+use App\QuestionResponse;
+use App\ResponseTranscription;
+use Services_Twilio_Twiml;
+use Cookie;
 
 class QuestionResponseController extends Controller
 {
@@ -15,64 +21,125 @@ class QuestionResponseController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function store($questionId, Request $request)
+    public function storeVoice($surveyId, $questionId, Request $request)
     {
-        $newResponse = new \App\QuestionResponse();
-        $newResponse->call_sid = $request->input('CallSid');
-        $newResponse->kind = $request->input('Kind');
-        $newResponse->question_id = $questionId;
-        $newResponse->response = $this->_responseFromRequest($request);
+        $question = Question::find($questionId);
+        $newResponse = $question->responses()->create(
+            ['response' => $this->_responseFromVoiceRequest($question, $request),
+             'type' => 'voice',
+             'session_sid' => $request->input('CallSid')]
+        );
 
-        $newResponse->save();
-
-        $nextQuestion = $this->_questionAfter($questionId);
+        $nextQuestion = $this->_questionAfter($question);
 
         if (is_null($nextQuestion)) {
-            return $this->_messageAfterLastQuestion();
+            return $this->_responseWithXmlType($this->_voiceMessageAfterLastQuestion());
         } else {
-            $nextQuestionUrl = route('question.show', ['id' => $this->_questionAfter($questionId)], false);
-            return redirect($nextQuestionUrl)->setStatusCode(303);
+            return $this->_responseWithXmlType(
+                $this->_redirectToQuestion($nextQuestion, 'question.show.voice')
+            );
         }
     }
 
-    private function _responseFromRequest(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function storeSms($surveyId, $questionId, Request $request)
     {
-        if ($request->input('Kind') === 'voice') {
+        $question = Question::find($questionId);
+        $newResponse = $question->responses()->create(
+            ['response' => $request->input('Body'),
+             'type' => 'sms',
+             'session_sid' => $request->cookie('survey_session')]
+        );
+
+        $nextQuestion = $this->_questionAfter($question);
+
+        if (is_null($nextQuestion)) {
+            return $this->_responseWithXmlType($this->_smsMessageAfterLastQuestion());
+        } else {
+            return $this->_responseWithXmlType(
+                $this->_redirectToQuestion($nextQuestion, 'question.show.sms')
+            );
+        }
+    }
+
+    public function storeTranscription($surveyId, $questionId, Request $request)
+    {
+        $callSid = $request->input('CallSid');
+        $question = Question::find($questionId);
+        $questionResponse = $question->responses()->where('session_sid', $callSid)->firstOrFail();
+        $questionResponse->responseTranscription()->create(
+            ['transcription' => $this->_transcriptionMessageIfCompleted($request)]
+        );
+    }
+
+    private function _responseFromVoiceRequest($question, $request)
+    {
+        if ($question->kind === 'free-answer') {
             return $request->input('RecordingUrl');
         } else {
             return $request->input('Digits');
         }
     }
 
-    private function _messageAfterLastQuestion()
+    private function _questionAfter($question)
     {
-        $voiceResponse = new \Services_Twilio_Twiml();
+        $survey = Survey::find($question->survey_id);
+        $allQuestions = $survey->questions()->orderBy('id', 'asc')->get();
+        $position = $allQuestions->search($question);
+        $nextQuestion = $allQuestions->get($position + 1);
+        return $nextQuestion;
+    }
+
+    private function _redirectToQuestion($question, $route)
+    {
+        $questionUrl = route(
+            $route,
+            ['question' => $question->id, 'survey' => $question->survey->id]
+        );
+        $redirectResponse = new Services_Twilio_Twiml();
+        $redirectResponse->redirect($questionUrl, ['method' => 'GET']);
+
+        return response($redirectResponse);
+    }
+
+    private function _voiceMessageAfterLastQuestion()
+    {
+        $voiceResponse = new Services_Twilio_Twiml();
         $voiceResponse->say('That was the last question');
         $voiceResponse->say('Thank you for participating in this survey');
         $voiceResponse->say('Good-bye');
         $voiceResponse->hangup();
 
-        return $voiceResponse;
+        return response($voiceResponse);
     }
 
-    private function _questionAfter($questionId)
-    {
-        $question = \App\Question::find($questionId);
-        $survey = \App\Survey::find($question->survey_id);
-        $allQuestions = $survey->questions()->orderBy('id', 'asc')->get();
-        $position = $allQuestions->search($question);
-
-        $nextQuestion = $allQuestions->get($position + 1);
-
-        return $this->_idIfNotNull($nextQuestion);
+    private function _smsMessageAfterLastQuestion() {
+        $messageResponse = new Services_Twilio_Twiml();
+        $messageResponse->message(
+            "That was the last question.\n" .
+            "Thank you for participating in this survey.\n" .
+            'Good bye.'
+        );
+        return response($messageResponse)
+                   ->withCookie(Cookie::forget('survey_session'))
+                   ->withCookie(Cookie::forget('current_question'));
     }
 
-    private function _idIfNotNull($question)
+    private function _transcriptionMessageIfCompleted($request)
     {
-        if (is_null($question)) {
-            return null;
-        } else {
-            return $question->id;
+        if ($request->input('TranscriptionStatus') === 'completed') {
+            return $request->input('TranscriptionText');
         }
+        return 'An error occurred while transcribing the answer';
+    }
+
+    private function _responseWithXmlType($response)
+    {
+        return $response->header('Content-Type', 'application/xml');
     }
 }
