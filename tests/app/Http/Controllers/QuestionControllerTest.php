@@ -43,19 +43,19 @@ class QuestionControllerTest extends TestCase
              'survey' => $this->survey->id]
         );
 
-        /*$transcriptionUrl = route(
-            'response.update',
-            []
-        );*/
+        $transcriptionUrl = route(
+            'response.transcription.store',
+            ['question' => $this->question->id,
+             'survey' => $this->survey->id]
+        );
 
         $responseDocument = new SimpleXMLElement($response->getContent());
 
         $this->assertContains($this->question->body, $response->getContent());
         $this->assertContains($savingUrl, $response->getContent());
         $this->assertNotContains($absoluteSavingUrl, $response->getContent());
-        //$this->assertEquals()
-        //$this->assertEquals('GET', strval($redirectDocument->Redirect->attributes()['method']));
-
+        $this->assertEquals($transcriptionUrl, strval($responseDocument->Record->attributes()['transcribeCallback']));
+        $this->assertTrue(boolval($responseDocument->Record->attributes()['transcribe']));
     }
 
     public function testShowSmsQuestion() {

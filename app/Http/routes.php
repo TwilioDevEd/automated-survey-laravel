@@ -53,7 +53,7 @@ Route::post(
     '/survey/{survey}/question/{question}/response/sms',
     ['as' => 'response.store.sms', 'uses' => 'QuestionResponseController@storeSms']
 );
-Route::put(
-    '/survey/{survey}/question/{question}/response/{response}',
-    ['as' => 'response.update', 'uses' => 'QuestionResponseController@update']
+Route::post(
+    '/survey/{survey}/question/{question}/response/transcription',
+    ['as' => 'response.transcription.store', 'uses' => 'QuestionResponseController@storeTranscription']
 );

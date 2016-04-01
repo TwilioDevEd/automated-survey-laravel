@@ -92,7 +92,17 @@ class QuestionController extends Controller
         );
 
         if ($question->kind === 'voice') {
-            $voiceResponse->record(['method' => 'POST', 'action' => $storeResponseURL]);
+            $transcribeUrl = route(
+                'response.transcription.store',
+                ['question' => $question->id,
+                 'survey' => $question->survey->id]
+            );
+            $voiceResponse->record(
+                ['method' => 'POST',
+                 'action' => $storeResponseURL,
+                 'transcribe' => true,
+                 'transcribeCallback' => $transcribeUrl]
+            );
         } elseif ($question->kind === "yes-no") {
             $voiceResponse->gather(['method' => 'POST', 'action' => $storeResponseURL]);
         } elseif ($question->kind === "numeric") {

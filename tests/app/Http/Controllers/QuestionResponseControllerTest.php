@@ -30,7 +30,8 @@ class QuestionResponseControllerTest extends TestCase
     {
         $responseForQuestion = [
             'RecordingUrl' => '//somefake.mp3',
-            'CallSid' => '7h1515un1qu3'
+            'CallSid' => '7h1515un1qu3',
+            'Digits' => '10'
         ];
 
         $firstResponse = $this->call(
@@ -58,6 +59,7 @@ class QuestionResponseControllerTest extends TestCase
         );
 
         $this->assertNotContains('Redirect', $secondResponse->getContent());
+        $this->assertContains('That was the last question', $secondResponse->getContent());
     }
 
     public function testStoreSmsResponse()
@@ -124,17 +126,19 @@ class QuestionResponseControllerTest extends TestCase
         $questionResponse = $this->questionOne->responses()->create(
             ['response' => 'Some answer',
              'type' => 'voice',
-             'session_sid' => 'some SID']
+             'session_sid' => 'call_sid']
         );
         $this->assertNull($questionResponse->responseTranscription);
 
         $response = $this->call(
-            'PUT',
+            'POST',
             route(
-                'response.update',
+                'response.transcription.store',
                 ['survey' => $this->survey->id, 'question' => $this->questionOne->id, 'response' => $questionResponse->id]
             ),
-            ['TranscriptionText' => 'transcribed answer!', 'TranscriptionStatus' => 'completed']
+            ['TranscriptionText' => 'transcribed answer!',
+             'TranscriptionStatus' => 'completed',
+             'CallSid' => 'call_sid']
         );
         $questionResponse = $questionResponse->fresh();
         $transcription = $questionResponse->responseTranscription;
@@ -147,17 +151,19 @@ class QuestionResponseControllerTest extends TestCase
         $questionResponse = $this->questionOne->responses()->create(
             ['response' => 'Some answer',
              'type' => 'voice',
-             'session_sid' => 'some SID']
+             'session_sid' => 'call_sid']
         );
         $this->assertNull($questionResponse->responseTranscription);
 
         $response = $this->call(
-            'PUT',
+            'POST',
             route(
-                'response.update',
-                ['survey' => $this->survey->id, 'question' => $this->questionOne->id, 'response' => $questionResponse->id]
+                'response.transcription.store',
+                ['survey' => $this->survey->id, 'question' => $this->questionOne->id]
             ),
-            ['TranscriptionText' => 'Some error occurred', 'TranscriptionStatus' => 'failed']
+            ['TranscriptionText' => 'Some error occurred',
+             'TranscriptionStatus' => 'failed',
+             'CallSid' => 'call_sid']
         );
         $questionResponse = $questionResponse->fresh();
         $transcription = $questionResponse->responseTranscription;

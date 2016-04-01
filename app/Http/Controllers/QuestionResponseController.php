@@ -67,9 +67,11 @@ class QuestionResponseController extends Controller
         }
     }
 
-    public function update($surveyId, $questionId, $responseId, Request $request)
+    public function storeTranscription($surveyId, $questionId, Request $request)
     {
-        $questionResponse = QuestionResponse::find($responseId);
+        $callSid = $request->input('CallSid');
+        $question = Question::find($questionId);
+        $questionResponse = $question->responses()->where('session_sid', $callSid)->firstOrFail();
         $questionResponse->responseTranscription()->create(
             ['transcription' => $this->_transcriptionMessageIfCompleted($request)]
         );
@@ -113,7 +115,7 @@ class QuestionResponseController extends Controller
         $voiceResponse->say('Good-bye');
         $voiceResponse->hangup();
 
-        return $voiceResponse;
+        return response($voiceResponse);
     }
 
     private function _smsMessageAfterLastQuestion() {
