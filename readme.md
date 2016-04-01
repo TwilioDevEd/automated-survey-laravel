@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/TwilioDevEd/automated-survey-laravel.svg?branch=master)](https://travis-ci.org/TwilioDevEd/automated-survey-laravel)
 
-This application demostrates how to use Twilio and TwiML to perform
+This application demonstrates how to use Twilio and TwiML to perform
 automatic phone surveys.
 
 [Read the full tutorial](https://www.twilio.com/docs/tutorials/walkthrough/automated-survey/php/laravel)!
@@ -13,79 +13,144 @@ automatic phone surveys.
 
 ## Running locally
 
-### The web application
+1. Clone the repository and `cd` into it.
 
-1. Clone the repository, copy the included `env.example` as `.env` and
-   customize it to your needs. The application only requires a running database.
-2. Use composer to install the app's dependencies by running `composer
-   install` in the repo's root.
-3. Run the database migrations using `php artisan migrate`. If the
-   database is configured correctly in `.env` this will get you a
-   working database.
-4. In order to run the application you will need at least one
-   survey. The repository includes a sample survey you can use to test
-   the application. Run `php artisan surveys:load bear_survey.json` to
-   load a survey about bears into your database. If you have deployed
-   to Heroku using the button you already have this survey loaded.
+1. Install the application's dependencies with [Composer](https://getcomposer.org/)
 
-### Configuring Twilio to call your application
+   ```bash
+   $ composer install
+   ```
+1. The application uses PostgreSQL as the persistence layer. If you
+  don't have it already, you should install it. The easiest way is by
+  using [Postgres.app](http://postgresapp.com/).
 
-#### Exposing the app via ngrok
+1. Create a database.
 
-For this demo it's necessary that your local application instance is
-accessible from the Internet. The easiest way to accomplish this
-during development is using [ngrok](https://ngrok.com/). If you're
-running OS X you can install ngrok using Homebrew by running `brew
-install ngrok`. First you will need to run the application:
+  ```bash
+  $ createdb surveys
+  ```
 
-```
-php artisan serve
-```
+1. Copy the sample configuration file and edit it to match your configuration.
 
-After this you can expose the application to the wider Internet by
-running (port 8000 is the default for Laravel):
+   ```bash
+   $ cp .env.example .env
+   ```
 
-```
-ngrok 8000
-```
+1. Generate an `APP_KEY`.
 
-#### Configuring Twilio's webhooks
+   ```bash
+   $ php artisan key:generate
+   ```
 
-You will need to provision at least one Twilio number with voice
-capabilities so the application's users can take surveys. You can do
-that
-[here](https://www.twilio.com/user/account/phone-numbers/search). Once
-you have a number you need to configure your number to work with your
-application. Open
-[the number management page](https://www.twilio.com/user/account/phone-numbers/incoming)
-and open a number's configuration by clicking on it.
+1. Run the migrations.
 
-![Open a number configuration](https://raw.github.com/TwilioDevEd/automated-survey-laravel/master/number-conf.png)
+  ```bash
+  $ php artisan migrate
+  ```
 
-Next, edit the "Request URL" field under the "Voice" section and point
-it towards your ngrok-exposed application `/first_survey` route. Make
-sure the method is set to POST. If you have are trying out the Heroku
-application you need to point Twilio to
-`http://<your-app-name>.herokuapp.com/first_survey`. See the image
-below for an example:
+1. Load a survey.
 
-![Webhook configuration](https://raw.github.com/TwilioDevEd/automated-survey-laravel/master/webhook-conf.png)
+  ```bash
+  $ php artisan heroku:initialize bear_survey.json
+  ```
 
-Give your number a call, answer the questions about bears and then go to:
+1. Expose the application to the wider Internet using [ngrok](https://ngrok.com/)
 
-```
-http://localhost:8000/survey/1/results
-```
+   ```bash
+   $ ngrok http 8000
+   ```
+   Now you have a public url that will forward requests to your localhost. It should
+   look like this:
 
-The results of the survey should be there.
+   ```
+   http://<your-ngrok-subdomain>.ngrok.io
+   ```
 
-#### Running the tests
+1. Configure Twilio to call your webhooks.
+
+   You will also need to configure Twilio to send requests to your application
+   when SMS or voice calls are received.
+
+   You will need to provision at least one Twilio number with SMS and voice capabilities.
+   You can buy a number [right
+   here](https://www.twilio.com/user/account/phone-numbers/search). Once you have
+   a number you need to configure it to work with your application. Open
+   [the number management page](https://www.twilio.com/user/account/phone-numbers/incoming)
+   and open a number's configuration by clicking on it.
+
+   ![Configure Voice](http://howtodocs.s3.amazonaws.com/twilio-number-config-all-med.gif)
+
+   For this application you must set the voice webhook of your number so that it
+   looks something like this:
+
+   ```
+   http://<your-ngrok-subdomain>.ngrok.io/voice/connect
+   ```
+   And the SMS webhook should look something like this:
+   ```
+   http://<your-ngrok-subdomain>.ngrok.io/sms/connect
+   ```
+   And in this case set the `POST` method on the configuration for both webhooks.
+
+1. Run the application using Artisan.
+
+   ```bash
+   $ php artisan serve
+   ```
+
+   It is `artisan serve` default behaviour to use `http://localhost:8000` when
+   the application is run. This means that the ip addresses where your app will be
+   reachable on you local machine will vary depending on the operating system.
+
+   The most common scenario is that your app will be reachable through address
+   `http://127.0.0.1:8000`. This is important because ngrok creates the
+   tunnel using only that address. So, if `http://127.0.0.1:8000` is not reachable
+   in your local machine when you run the app, you must tell artisan to use this
+   address. Here's how to set that up:
+
+   ```bash
+   $ php artisan serve --host=127.0.0.1
+   ```
+
+## How to Demo
+
+1. Set up your application to run locally or in Heroku.
+
+1. Update your [Twilio Number](https://www.twilio.com/user/account/phone-numbers/incoming)'s
+   voice and SMS webhooks with your ngrok url.
+
+1. Give your number a call or send and SMS with the "start" command.
+
+1. Follow the instructions until you answer all the questions.
+
+1. When you are notified that you have reached the end of the survey visit your
+   application's root to check the results at:
+
+   http://localhost:8000
+
+
+## Running the tests
 
 The tests interact with the database so you'll first need to migrate
 your test database. First, set the `DATABASE_URL_TEST` and then run:
 
-`APP_ENV=testing php artisan migrate`
+```bash
+$ createdb surveys_test
+$ APP_ENV=testing php artisan migrate
+```
 
-The tests then can be run using
+Run at the top-level directory.
 
-`phpunit`
+```bash
+$ phpunit
+```
+
+If you don't have phpunit installed on your system, you can follow [these
+instructions](https://phpunit.de/manual/current/en/installation.html) to
+install it.
+
+## Meta
+
+* No warranty expressed or implied. Software is as is. Diggity.
+* [MIT License](http://www.opensource.org/licenses/mit-license.html)
+* Lovingly crafted by Twilio Developer Education.
