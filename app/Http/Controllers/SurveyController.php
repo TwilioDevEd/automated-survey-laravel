@@ -14,6 +14,8 @@ use Services_Twilio_Twiml;
 
 class SurveyController extends Controller
 {
+    const START_SMS_SURVEY_COMMAND = 'start';
+
     public function showResults($surveyId)
     {
         $survey = Survey::find($surveyId);
@@ -93,7 +95,7 @@ class SurveyController extends Controller
 
     private function _getNextSmsStepFromCookies($request) {
         $response = new Services_Twilio_Twiml();
-        if (strtolower(trim($request->input('Body'))) === 'start') {
+        if (strtolower(trim($request->input('Body'))) === self::START_SMS_SURVEY_COMMAND) {
             $messageSid = $request->input('MessageSid');
 
             return $this->_redirectWithFirstSurvey('survey.show.sms', $response)
