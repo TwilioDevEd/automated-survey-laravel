@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'key' => substr(env('APP_KEY', 'SomeRandomString'), 0, 32),
+    'key' => substr(env('APP_KEY', 'SomeRandomStringSomeRandomString'), 0, 32),
 
     'cipher' => 'AES-256-CBC',
 

@@ -6,7 +6,7 @@ use App\Twilio\SurveyParser;
 class SurveyParserTest extends TestCase
 {
     const SAMPLE_SURVEY = <<<EOD
-    {"title": "About bears", "questions": [{"body": "What type of bear is best?", "kind": "voice"}, {"body": "In a scale of 1 to 10 how cute do you find koalas?", "kind": "numeric"}, {"body": "Do you think bears beat beets?", "kind": "yes-no"}]}
+    {"title": "About bears", "questions": [{"body": "What type of bear is best?", "kind": "free-answer"}, {"body": "In a scale of 1 to 10 how cute do you find koalas?", "kind": "numeric"}, {"body": "Do you think bears beat beets?", "kind": "yes-no"}]}
 EOD;
 
     public function testParserTitle()
@@ -18,7 +18,7 @@ EOD;
     {
         $parser = new SurveyParser(self::SAMPLE_SURVEY);
         $firstQuestion = ['body' => 'What type of bear is best?',
-                          'kind' => 'voice'];
+                          'kind' => 'free-answer'];
 
         $secondQuestion = ['body' => 'In a scale of 1 to 10 how cute do you find koalas?',
                            'kind' => 'numeric'];

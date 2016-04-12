@@ -10,16 +10,11 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="#">Automated surveys</a>
             </div>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{{ route('survey.index') }}">All surveys</a></li>
-                </ul>
-            </div>
         </nav>
-        <div class="container">
+        <div class="container-fluid">
             @yield('content')
         </div>
-        <footer class="container">
+        <footer class="container text-center">
             Made with <i class="fa fa-heart"></i> by your pals
             <a href="http://www.twilio.com">@twilio</a>
         </footer>

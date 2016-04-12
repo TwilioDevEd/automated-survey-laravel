@@ -16,11 +16,11 @@ class CreateQuestionsTable extends Migration
             'questions', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('body');
-                $table->string('kind');
+                $table->enum('kind', ['free-answer', 'yes-no', 'numeric']);
                 $table->integer('survey_id');
                 $table->timestamps();
 
-                $table->foreign('survey_id')->references('id')->on('surveys');
+                $table->foreign('survey_id')->references('id')->on('surveys')->onDelete('cascade');;
             }
         );
     }

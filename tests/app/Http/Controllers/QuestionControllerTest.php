@@ -17,33 +17,63 @@ class QuestionControllerTest extends TestCase
     {
         parent::setUp();
         $this->beginDatabaseTransaction();
+        $this->survey = new Survey(['title' => 'Testing survey']);
+        $this->question = new Question(['body' => 'What is this?', 'kind' => 'free-answer']);
+
+        $this->survey->save();
+        $this->question->survey()->associate($this->survey)->save();
     }
 
-    public function testShowQuestion()
+    public function testShowVoiceQuestion()
     {
-        $survey = new Survey(['title' => 'Testing survey']);
-        $question = new Question(['body' => 'What is this?', 'kind' => 'voice']);
-
-        $survey->save();
-        $question->survey()->associate($survey)->save();
-
         $response = $this->call(
             'GET',
-            route('question.show', ['id' => $question->id])
+            route('question.show.voice', ['question' => $this->question->id, 'survey' => $this->survey->id])
         );
 
         $savingUrl = route(
-            'question.question_response.store',
-            ['question_id' => $question->id], false
+            'response.store.voice',
+            ['question' => $this->question->id,
+             'survey' => $this->survey->id], false
         );
 
         $absoluteSavingUrl = route(
-            'question.question_response.store',
-            ['question_id' => $question->id]
+            'response.store.voice',
+            ['question' => $this->question->id,
+             'survey' => $this->survey->id]
         );
 
-        $this->assertContains($question->body, $response->getContent());
-        $this->assertContains($savingUrl . '?Kind=voice', $response->getContent());
+        $transcriptionUrl = route(
+            'response.transcription.store',
+            ['question' => $this->question->id,
+             'survey' => $this->survey->id]
+        );
+
+        $responseDocument = new SimpleXMLElement($response->getContent());
+
+        $this->assertContains($this->question->body, $response->getContent());
+        $this->assertContains($savingUrl, $response->getContent());
         $this->assertNotContains($absoluteSavingUrl, $response->getContent());
+        $this->assertEquals($transcriptionUrl, strval($responseDocument->Record->attributes()['transcribeCallback']));
+        $this->assertTrue(boolval($responseDocument->Record->attributes()['transcribe']));
+    }
+
+    public function testShowSmsQuestion() {
+        $response = $this->call(
+            'GET',
+            route('question.show.sms', ['question' => $this->question->id, 'survey' => $this->survey->id])
+        );
+        $cookies = $response->headers->getCookies();
+
+        $this->assertCount(1, $cookies);
+        $this->assertEquals('current_question', $cookies[0]->getName());
+        $this->assertEquals($this->question->id, $cookies[0]->getValue());
+
+        $messageDocument = new SimpleXMLElement($response->getContent());
+
+        $this->assertEquals(
+            $this->question->body . "\n\nReply to this message with your answer",
+            strval($messageDocument->Message)
+        );
     }
 }
