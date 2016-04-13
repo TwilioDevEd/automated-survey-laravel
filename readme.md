@@ -1,9 +1,9 @@
-#  Automated surveys using Laravel
+#  Automated Surveys Using Laravel
 
 [![Build Status](https://travis-ci.org/TwilioDevEd/automated-survey-laravel.svg?branch=master)](https://travis-ci.org/TwilioDevEd/automated-survey-laravel)
 
 This application demonstrates how to use Twilio and TwiML to perform
-automatic phone surveys.
+automated phone surveys.
 
 [Read the full tutorial](https://www.twilio.com/docs/tutorials/walkthrough/automated-survey/php/laravel)!
 
@@ -20,6 +20,7 @@ automatic phone surveys.
    ```bash
    $ composer install
    ```
+
 1. The application uses PostgreSQL as the persistence layer. If you
   don't have it already, you should install it. The easiest way is by
   using [Postgres.app](http://postgresapp.com/).
@@ -59,7 +60,7 @@ automatic phone surveys.
    ```bash
    $ ngrok http 8000
    ```
-   Now you have a public url that will forward requests to your localhost. It should
+   Now you have a public URL that will forward requests to your localhost. It should
    look like this:
 
    ```
@@ -69,7 +70,7 @@ automatic phone surveys.
 1. Configure Twilio to call your webhooks.
 
    You will also need to configure Twilio to send requests to your application
-   when SMS or voice calls are received.
+   when an SMS or a voice call is received.
 
    You will need to provision at least one Twilio number with SMS and voice capabilities.
    You can buy a number [right
@@ -80,16 +81,19 @@ automatic phone surveys.
 
    ![Configure Voice](http://howtodocs.s3.amazonaws.com/twilio-number-config-all-med.gif)
 
-   For this application you must set the voice webhook of your number so that it
-   looks something like this:
+   For this application you must set the voice webhook of your number.
+   It will look something like this:
 
    ```
    http://<your-ngrok-subdomain>.ngrok.io/voice/connect
    ```
+
    And the SMS webhook should look something like this:
+
    ```
    http://<your-ngrok-subdomain>.ngrok.io/sms/connect
    ```
+
    And in this case set the `POST` method on the configuration for both webhooks.
 
 1. Run the application using Artisan.
@@ -98,7 +102,7 @@ automatic phone surveys.
    $ php artisan serve
    ```
 
-   It is `artisan serve` default behaviour to use `http://localhost:8000` when
+   It is `artisan serve` default behavior to use `http://localhost:8000` when
    the application is run. This means that the ip addresses where your app will be
    reachable on you local machine will vary depending on the operating system.
 
@@ -119,11 +123,11 @@ automatic phone surveys.
 1. Update your [Twilio Number](https://www.twilio.com/user/account/phone-numbers/incoming)'s
    voice and SMS webhooks with your ngrok url.
 
-1. Give your number a call or send and SMS with the "start" command.
+1. Give your number a call or send yourself and an SMS with the "start" command.
 
 1. Follow the instructions until you answer all the questions.
 
-1. When you are notified that you have reached the end of the survey visit your
+1. When you are notified that you have reached the end of the survey, visit your
    application's root to check the results at:
 
    http://localhost:8000
