@@ -11,14 +11,14 @@
 
       ![Automated Survey Diagram](//s3.amazonaws.com/howtodocs/automated-survey.png)
 
-      1. The end user calls or sends an SMS to the survey phone number.
+      1. The end user calls or sends an SMS to the survey's phone number.
 
       1. Twilio gets the call or text and makes an HTTP request to your application asking for instructions on how to respond.
 
       1. Your web application instructs Twilio (using [TwiML](//www.twilio.com/docs/api/twiml))
          to [`Gather`](//www.twilio.com/docs/api/twiml/gather) or
-         [`Record`](//www.twilio.com/docs/api/twiml/record) the user input over the phone,
-         and prompt for text input with [`Message`](//www.twilio.com/docs/api/twiml/sms/message)
+         [`Record`](//www.twilio.com/docs/api/twiml/record) the user's voice input,
+         and prompt text input with [`Message`](//www.twilio.com/docs/api/twiml/sms/message)
          if you are using SMS.
 
       1. After each question, Twilio makes another request to your server with the user's input, which your application stores on its database.
@@ -35,18 +35,15 @@
     :markdown
       ## Creating a Survey
 
-      In order to perform automated surveys we first need to have some
-      questions to ask. For your convenience, the application's
+      In order to perform automated surveys we first need to have
+      questions on it. For your convenience, the application's
       repository already includes one survey that can be loaded into
-      the database. Refer to the [Readme File](//github.com/TwilioDevEd/automated-survey-laravel)
+      the database. You can take a look at the [Readme File](//github.com/TwilioDevEd/automated-survey-laravel)
       for detailed instructions.
 
       You can modify the questions from the survey by editing the
       [bear_survey.json](//github.com/TwilioDevEd/automated-survey-laravel/blob/master/bear_survey.json)
       file located in the root of the repository and re-running the app.
-
-      We want users to take our survey, so next we will implement
-      the handler for SMS and calls.
 
    .step(data-tile='The Interview Loop')
     :markdown
@@ -57,10 +54,10 @@
 
       ![Survey Flow Chart](//s3.amazonaws.com/howtodocs/flowchart.png)
 
-      The user can answer a question for your survey over the phone using either their phone's keypad or by speaking.
+      The user can answer a question for your survey over the phone using either their phone's keypad or by voice.
       After each interaction, Twilio will make an HTTP request to your web application with either the string of
       keys the user pressed or a URL to a recording of their voice input.
-      
+
       For SMS surveys the user will answer questions just by replying
       with another SMS to the Twilio number that sent the question.
 
@@ -94,8 +91,9 @@
       (`/voice/connect` for calls and `/sms/connect` for sms).
 
       Each of these endpoints will receive the request and return
-      a welcome message to the user. For phone users, the built message will contain a `Say`
-      verb with the message or a `Message` Verb for SMS. It will also include a
+      a welcome message to the user. When users call the Twilio number
+      our application will use the `Say` verb. For users that respond via SMS, the
+      application will use a `Message` Verb. It will also include a
       `Redirect` verb to the question's endpoint to continue with the survey flow.
 
       ---
@@ -113,7 +111,7 @@
     data-highlight='74-83')
     :markdown
       ## Asking Questions (Voice)
-      
+
       After Hearing the welcome message, the user will be redirected to the first question.
 
       Each type of question will produce different instructions on how to proceed.
@@ -128,8 +126,9 @@
       will be responsible to receive and store the caller's answer.
 
       During the Record verb creation, we also ask for a [Transcription](//www.twilio.com/docs/api/rest/transcription).
-      Twilio will process the record and extract useful text, making a request to our response endpoint when transcription is done.
-      
+      Twilio will process the recording and extract useful text. When transcription is done it will
+      make a request to our response's endpoint.
+
       ---
 
       **See Also:**
@@ -140,11 +139,11 @@
     data-highlight='64-72')
     :markdown
       ## Asking Questions (SMS)
-      
+
       To ask questions over SMS we just need to use the [`<Message>`](//www.twilio.com/docs/api/twiml/sms/message)
       TwiML verb. When the user starts a new survey, he/she will receive a welcome message and
       also a message with the first question.
-      
+
       When the user is interacting over SMS we don't have something like an ongoing call session with a well defined state.
       It becomes harder to know if an SMS is answering question 2 or 20, since all requests will be fired to `/sms/connect` main endpoint.
       To solve that, we can use [Twilio Cookies](//www.twilio.com/blog/2014/07/the-definitive-guide-to-sms-conversation-tracking.html)
@@ -155,11 +154,12 @@
     :markdown
       ## Storing Answers
 
-      After the user has finished speaking and pressing keys, Twilio just sends a request telling what happened and asking for further instructions.
+      After the user has finished inputting voice commands or pressing keys, Twilio just sends a request telling what happened and asking for further instructions.
 
       At this point, we need to recover data from Twilio's request parameters and store them.
 
-      Recovered parameters vary according to what we asked on the questions, they can be:
+      Recovered parameters vary according to the questions, they can be:
+
       * `Body` contains the text message from answer over SMS.
       * `Digits` contains the keys pressed for a numeric question.
       * `RecodingUrl` contains the URL for listening a recorded message.
@@ -181,10 +181,10 @@
       ## Displaying the Survey Results
 
       You can access the survey results in the application's root route.
-      
+
       The results will be shown grouped by survey results. For recorded answers
       you can click on a playback icon to listen to the user's answer.
-      
+
       Also, the transcribed answer will be shown when available for recorded voice answers.
 
   .step
@@ -200,14 +200,14 @@
       useful.  If you're a PHP developer working with Twilio, you
       might enjoy these other tutorials:
 
-      [**Click to Call**](https://www.twilio.com/docs/howto/walkthrough/click-to-call/php/laravel)  
+      [**Click to Call**](https://www.twilio.com/docs/howto/walkthrough/click-to-call/php/laravel)
       Put a button on your web page that connects visitors to live support or sales
       people via telephone.
 
-      [**Two-Factor Authentication**](https://www.twilio.com/docs/howto/walkthrough/two-factor-authentication/php/laravel) 
+      [**Two-Factor Authentication**](https://www.twilio.com/docs/howto/walkthrough/two-factor-authentication/php/laravel)
       Improve the security of Laravel's built-in login functionality by adding
       two-factor authentication via text message.
 
       ### Did this help?
       Thanks for checking this tutorial out! If you have any feedback to share with us,
-      we'd love to hear it.[Contact support](//www.twilio.com/help/contact) to let us know what you think.
+      we'd love to hear it. [Contact the Twilio Developer Education Team](mailto:deved-oss@twilio.com) to let us know what you think.
