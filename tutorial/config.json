@@ -1,6 +1,6 @@
 {
     "title": "Automated surveys with Laravel",
-    "repo": "TwilioDevEd/surveys-laravel",
+    "repo": "TwilioDevEd/automated-survey-laravel",
     "description": "Learn how to leverage the Twilio API and TwiML to conduct automated phone surveys.",
     "heroku": true
 }
