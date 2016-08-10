@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Survey;
 use App\QuestionResponse;
 
-use Services_Twilio_Twiml;
+use Twilio\Twiml;
 
 class SurveyController extends Controller
 {
@@ -39,7 +39,7 @@ class SurveyController extends Controller
 
     public function connectVoice()
     {
-        $response = new Services_Twilio_Twiml();
+        $response = new Twiml();
         $redirectResponse = $this->_redirectWithFirstSurvey('survey.show.voice', $response);
         return $this->_responseWithXmlType($redirectResponse);
     }
@@ -53,7 +53,7 @@ class SurveyController extends Controller
     public function showVoice($id)
     {
         $surveyToTake = Survey::find($id);
-        $voiceResponse = new Services_Twilio_Twiml();
+        $voiceResponse = new Twiml();
 
         if (is_null($surveyToTake)) {
             return $this->_responseWithXmlType($this->_noSuchVoiceSurvey($voiceResponse));
@@ -74,7 +74,7 @@ class SurveyController extends Controller
     public function showSms($id)
     {
         $surveyToTake = Survey::find($id);
-        $voiceResponse = new Services_Twilio_Twiml();
+        $voiceResponse = new Twiml();
 
         if (is_null($surveyToTake)) {
             return $this->_responseWithXmlType($this->_noSuchSmsSurvey($voiceResponse));
@@ -94,7 +94,7 @@ class SurveyController extends Controller
     }
 
     private function _getNextSmsStepFromCookies($request) {
-        $response = new Services_Twilio_Twiml();
+        $response = new Twiml();
         if (strtolower(trim($request->input('Body'))) === self::START_SMS_SURVEY_COMMAND) {
             $messageSid = $request->input('MessageSid');
 

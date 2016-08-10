@@ -8,7 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use App\Question;
-use Services_Twilio_Twiml;
+use Twilio\Twiml;
 
 class QuestionController extends Controller
 {
@@ -63,7 +63,7 @@ class QuestionController extends Controller
 
     private function _commandForSms($question)
     {
-        $smsResponse = new Services_Twilio_Twiml();
+        $smsResponse = new Twiml();
 
         $messageBody = $question->body . $this->_messageForSmsQuestion($question);
         $smsResponse->message($messageBody);
@@ -73,7 +73,7 @@ class QuestionController extends Controller
 
     private function _commandForVoice($question)
     {
-        $voiceResponse = new Services_Twilio_Twiml();
+        $voiceResponse = new Twiml();
 
         $voiceResponse->say($question->body);
         $voiceResponse->say($this->_messageForVoiceQuestion($question));

@@ -15,15 +15,14 @@ automated phone surveys.
 
 1. Clone the repository and `cd` into it.
 
-1. Install the application's dependencies with [Composer](https://getcomposer.org/)
+1. Install the application's dependencies with [Composer](https://getcomposer.org/).
 
    ```bash
    $ composer install
    ```
 
-1. The application uses PostgreSQL as the persistence layer. If you
-  don't have it already, you should install it. The easiest way is by
-  using [Postgres.app](http://postgresapp.com/).
+1. The application uses PostgreSQL as the persistence layer. You should install it
+  if you don't have it. The easiest way is by using [Postgres.app](http://postgresapp.com/).
 
 1. Create a database.
 
@@ -88,13 +87,13 @@ automated phone surveys.
    http://<your-ngrok-subdomain>.ngrok.io/voice/connect
    ```
 
-   And the SMS webhook should look something like this:
+   The SMS webhook should look something like this:
 
    ```
    http://<your-ngrok-subdomain>.ngrok.io/sms/connect
    ```
 
-   And in this case set the `POST` method on the configuration for both webhooks.
+   For this application you must set the `POST` method on the configuration for both webhooks.
 
 1. Run the application using Artisan.
 
@@ -108,8 +107,8 @@ automated phone surveys.
 
    The most common scenario is that your app will be reachable through address
    `http://127.0.0.1:8000`. This is important because ngrok creates the
-   tunnel using only that address. So, if `http://127.0.0.1:8000` is not reachable
-   in your local machine when you run the app, you must tell artisan to use this
+   tunnel using that address only. So, if `http://127.0.0.1:8000` is not reachable
+   in your local machine when you run the app, you must set it so that artisan uses this
    address. Here's how to set that up:
 
    ```bash
@@ -123,7 +122,7 @@ automated phone surveys.
 1. Update your [Twilio Number](https://www.twilio.com/user/account/phone-numbers/incoming)'s
    voice and SMS webhooks with your ngrok url.
 
-1. Give your number a call or send yourself and an SMS with the "start" command.
+1. Give your number a call or send yourself an SMS with the "start" command.
 
 1. Follow the instructions until you answer all the questions.
 

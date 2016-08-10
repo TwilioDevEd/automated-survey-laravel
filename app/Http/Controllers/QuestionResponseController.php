@@ -10,7 +10,7 @@ use App\Question;
 use App\Survey;
 use App\QuestionResponse;
 use App\ResponseTranscription;
-use Services_Twilio_Twiml;
+use Twilio\Twiml;
 use Cookie;
 
 class QuestionResponseController extends Controller
@@ -105,7 +105,7 @@ class QuestionResponseController extends Controller
             $route,
             ['question' => $question->id, 'survey' => $question->survey->id]
         );
-        $redirectResponse = new Services_Twilio_Twiml();
+        $redirectResponse = new Twiml();
         $redirectResponse->redirect($questionUrl, ['method' => 'GET']);
 
         return response($redirectResponse);
@@ -113,7 +113,7 @@ class QuestionResponseController extends Controller
 
     private function _voiceMessageAfterLastQuestion()
     {
-        $voiceResponse = new Services_Twilio_Twiml();
+        $voiceResponse = new Twiml();
         $voiceResponse->say('That was the last question');
         $voiceResponse->say('Thank you for participating in this survey');
         $voiceResponse->say('Good-bye');
@@ -123,7 +123,7 @@ class QuestionResponseController extends Controller
     }
 
     private function _smsMessageAfterLastQuestion() {
-        $messageResponse = new Services_Twilio_Twiml();
+        $messageResponse = new Twiml();
         $messageResponse->message(
             "That was the last question.\n" .
             "Thank you for participating in this survey.\n" .
