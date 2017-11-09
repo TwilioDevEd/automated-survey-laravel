@@ -7,10 +7,6 @@ automated phone surveys.
 
 [Read the full tutorial](https://www.twilio.com/docs/tutorials/walkthrough/automated-survey/php/laravel)!
 
-## Deploying to Heroku
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
 ## Running locally
 
 1. Clone the repository and `cd` into it.
@@ -117,7 +113,7 @@ automated phone surveys.
 
 ## How to Demo
 
-1. Set up your application to run locally or in Heroku.
+1. Set up your application to run locally or in production.
 
 1. Update your [Twilio Number](https://www.twilio.com/user/account/phone-numbers/incoming)'s
    voice and SMS webhooks with your ngrok url.
