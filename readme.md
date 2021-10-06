@@ -14,7 +14,7 @@ automated phone surveys.
 1. Install the application's dependencies with [Composer](https://getcomposer.org/).
 
    ```bash
-   $ composer install
+   composer install
    ```
 
 1. The application uses PostgreSQL as the persistence layer. You should install it
@@ -22,38 +22,38 @@ automated phone surveys.
 
 1. Create a database.
 
-  ```bash
-  $ createdb surveys
-  ```
+   ```bash
+   createdb surveys
+   ```
 
 1. Copy the sample configuration file and edit it to match your configuration.
 
    ```bash
-   $ cp .env.example .env
+   cp .env.example .env
    ```
 
 1. Generate an `APP_KEY`.
 
    ```bash
-   $ php artisan key:generate
+   php artisan key:generate
    ```
 
 1. Run the migrations.
 
-  ```bash
-  $ php artisan migrate
-  ```
+   ```bash
+   php artisan migrate
+   ```
 
 1. Load a survey.
 
-  ```bash
-  $ php artisan heroku:initialize bear_survey.json
-  ```
+   ```bash
+   php artisan heroku:initialize bear_survey.json
+   ```
 
 1. Expose the application to the wider Internet using [ngrok](https://ngrok.com/)
 
    ```bash
-   $ ngrok http 8000
+   ngrok http 8000
    ```
    Now you have a public URL that will forward requests to your localhost. It should
    look like this:
@@ -94,7 +94,7 @@ automated phone surveys.
 1. Run the application using Artisan.
 
    ```bash
-   $ php artisan serve
+   php artisan serve
    ```
 
    It is `artisan serve` default behavior to use `http://localhost:8000` when
@@ -108,7 +108,7 @@ automated phone surveys.
    address. Here's how to set that up:
 
    ```bash
-   $ php artisan serve --host=127.0.0.1
+   php artisan serve --host=127.0.0.1
    ```
 
 ## How to Demo
@@ -134,14 +134,14 @@ The tests interact with the database so you'll first need to migrate
 your test database. First, set the `DATABASE_URL_TEST` and then run:
 
 ```bash
-$ createdb surveys_test
-$ APP_ENV=testing php artisan migrate
+createdb surveys_test
+APP_ENV=testing php artisan migrate
 ```
 
 Run at the top-level directory.
 
 ```bash
-$ phpunit
+phpunit
 ```
 
 If you don't have phpunit installed on your system, you can follow [these
