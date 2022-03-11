@@ -74,7 +74,8 @@ automated phone surveys.
    [the number management page](https://www.twilio.com/user/account/phone-numbers/incoming)
    and open a number's configuration by clicking on it.
 
-   [Learn how to configure a Twilio phone number for Programmable Voice](https://www.twilio.com/docs/voice/tutorials/how-to-respond-to-incoming-phone-calls-python#buy-and-configure-a-phone-number)
+   [Learn how to configure a Twilio phone number for Programmable Voice](https://www.twilio.com/docs/voice/quickstart/php#configure-your-webhook-url)
+   [Learn how to configure a Twilio phone number for Programmable SMS](https://support.twilio.com/hc/en-us/articles/223136047-Configure-a-Twilio-Phone-Number-to-Receive-and-Respond-to-Messages)
 
    For this application you must set the voice webhook of your number.
    It will look something like this:
